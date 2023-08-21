@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: manitas
+  profiles:
+    active: local
+  jmx:
+    default-domain: manitas
+
+server:
+  compression:
+    enabled: false
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,image/png,image/jpeg,image/vnd.sealedmedia.softseal.jpg,application/pdf,application/octet-stream
+    min-response-size: 300
+  servlet:
+    context-path: /manitas
+
+management:
+  server:
+    port: 85
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled : true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: '*'
+---
+
+---
+server:
+  port: 8081
+spring:
+  profiles: local
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/manitas?useSSL=false&serverTimezone=America/Mexico_City&allowPublicKeyRetrieval=true
+    username: root
+    password: hola1234
+    hikari:
+      maximum-pool-size: 10
+      auto-commit: true
+      connection-timeout: 1000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+      minimum-idle: 5
+  jpa:
+    hibernate.ddl-auto: none
+    generate-ddl: true
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+logging:
+  level:
+    root: INFO
+    org:
+      springframework: INFO
+    mx:
+      ipn:
+        escom:
+          pizarron:
+            crud: DEBUG
