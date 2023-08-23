@@ -14,4 +14,6 @@ public interface UserService {
     UserEntity getUser(String idUser) throws BusinessException;
 
     Page<UserEntity> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto);
+
+    UserEntity getUserByEmail(String email) throws BusinessException;
 }

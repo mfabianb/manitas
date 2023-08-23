@@ -2,9 +2,7 @@ package com.manitas.domain.service.impl;
 
 import com.manitas.application.dto.UserRequestDto;
 import com.manitas.application.dto.request.RequestDto;
-import com.manitas.domain.data.entity.RoleEntity;
 import com.manitas.domain.data.entity.UserEntity;
-import com.manitas.domain.data.entity.UserStatusEntity;
 import com.manitas.domain.data.repository.UserRepository;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.CatalogService;
@@ -37,8 +35,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity createUser(UserRequestDto userRequestDto) throws BusinessException {
-
-        log.info(UtilServlet.getCurrentHttpRequest());
 
         validateMandatoryUserData(userRequestDto);
 
@@ -105,6 +101,15 @@ public class UserServiceImpl implements UserService {
                 userRequestDtoRequestDto.getData().getIdRole(),
                 userRequestDtoRequestDto.getData().getIdUserStatus(),
                 getPage(userRequestDtoRequestDto));
+
+    }
+
+    @Override
+    public UserEntity getUserByEmail(String email) throws BusinessException {
+
+        Optional<UserEntity> userEntity = userRepository.findUserByEmail(email);
+        if(userEntity.isPresent()) return userEntity.get();
+        else throw new BusinessException(USER + SPACE + NOT_FOUND);
 
     }
 
