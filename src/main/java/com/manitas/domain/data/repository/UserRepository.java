@@ -25,8 +25,8 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
             "AND (DATE(u.creationDate) = DATE(:creationDate) OR :creationDate IS NULL) " +
             "AND (DATE(u.modificationDate) = DATE(:modificationDate) OR :modificationDate IS NULL) " +
             "AND (DATE(u.lastLogin) = DATE(:lastLogin) OR :lastLogin IS NULL) " +
-            "AND (u.idRole IN (:idRole)) " +
-            "AND (u.idUserStatus IN (:idUserStatus)) " +
+            "AND (u.idRole.idRole IN (:idRole)) " +
+            "AND (u.idUserStatus.idUserStatus IN (:idUserStatus)) " +
             "")
     Page<UserEntity> findPageByFilter(@Param("email") String email,
                                       @Param("name") String name,

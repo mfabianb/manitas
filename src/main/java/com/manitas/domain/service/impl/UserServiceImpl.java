@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserEntity> getList(RequestDto<UserEntity> userRequestDtoRequestDto){
+    public Page<UserEntity> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto){
 
         return userRepository.findPageByFilter(
                 userRequestDtoRequestDto.getData().getEmail(),
@@ -102,8 +102,8 @@ public class UserServiceImpl implements UserService {
                 userRequestDtoRequestDto.getData().getCreationDate(),
                 userRequestDtoRequestDto.getData().getModificationDate(),
                 userRequestDtoRequestDto.getData().getLastLogin(),
-                userRequestDtoRequestDto.getData().getIdRole().getIdRole(),
-                userRequestDtoRequestDto.getData().getIdUserStatus().getIdUserStatus(),
+                userRequestDtoRequestDto.getData().getIdRole(),
+                userRequestDtoRequestDto.getData().getIdUserStatus(),
                 getPage(userRequestDtoRequestDto));
 
     }
@@ -160,13 +160,13 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private Pageable getPage(RequestDto<UserEntity> userRequestDtoRequestDto){
+    private Pageable getPage(RequestDto<UserRequestDto> userRequestDtoRequestDto){
 
-        if(userRequestDtoRequestDto.getDescending())
+        if(Boolean.TRUE.equals(userRequestDtoRequestDto.getDescending()))
             return PageRequest.of(userRequestDtoRequestDto.getPage(), userRequestDtoRequestDto.getSize(),
                     Sort.by(userRequestDtoRequestDto.getSort()).descending());
         else
-            return PageRequest.of(userRequestDtoRequestDto.getPage(), userRequestDtoRequestDto.getPage(),
+            return PageRequest.of(userRequestDtoRequestDto.getPage(), userRequestDtoRequestDto.getSize(),
                     Sort.by(userRequestDtoRequestDto.getSort()).ascending());
 
     }

@@ -54,7 +54,8 @@ public class UserController {
     }
 
     @GetMapping
-    public DataResponse<Page<UserEntity>> getList(@RequestBody RequestDto<UserEntity> requestDto){
+    public DataResponse<Page<UserEntity>> getList(@RequestBody RequestDto<UserRequestDto> requestDto){
+        log.info(requestDto);
         return new DataResponse<>(true, null, HttpStatus.OK.value(), userService.getList(requestDto));
     }
 }

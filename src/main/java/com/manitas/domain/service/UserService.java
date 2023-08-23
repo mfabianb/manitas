@@ -13,5 +13,5 @@ public interface UserService {
 
     UserEntity getUser(String idUser) throws BusinessException;
 
-    Page<UserEntity> getList(RequestDto<UserEntity> userRequestDtoRequestDto);
+    Page<UserEntity> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto);
 }
