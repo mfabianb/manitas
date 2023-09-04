@@ -18,16 +18,15 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
     Optional<UserEntity> findUserByIdUser(String idUser);
 
     @Query("SELECT u FROM UserEntity u WHERE " +
-            "(u.email like :email OR :email IS NULL) " +
-            "AND (u.name like :name OR :name IS NULL) " +
-            "AND (u.lastname like :lastname OR :lastname IS NULL) " +
-            "AND (u.secondLastname like :secondLastname OR :secondLastname IS NULL) " +
+            "(u.email LIKE %:email% OR :email IS NULL) " +
+            "AND (u.name LIKE %:name% OR :name IS NULL) " +
+            "AND (u.lastname LIKE %:lastname% OR :lastname IS NULL) " +
+            "AND (u.secondLastname LIKE %:secondLastname% OR :secondLastname IS NULL) " +
             "AND (DATE(u.creationDate) = DATE(:creationDate) OR :creationDate IS NULL) " +
             "AND (DATE(u.modificationDate) = DATE(:modificationDate) OR :modificationDate IS NULL) " +
             "AND (DATE(u.lastLogin) = DATE(:lastLogin) OR :lastLogin IS NULL) " +
             "AND (u.idRole.idRole IN (:idRole)) " +
-            "AND (u.idUserStatus.idUserStatus IN (:idUserStatus)) " +
-            "")
+            "AND (u.idUserStatus.idUserStatus IN (:idUserStatus))")
     Page<UserEntity> findPageByFilter(@Param("email") String email,
                                       @Param("name") String name,
                                       @Param("lastname") String lastname,

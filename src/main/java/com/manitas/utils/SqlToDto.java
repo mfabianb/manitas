@@ -7,10 +7,8 @@ import java.io.FileReader;
 
 @Log4j2
 public class SqlToDto {
-    public static void main(String a[]){
-        try{
-            BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\mfab\\Documents\\dev\\manitas.sql"));
-
+    public static void main(String[] a){
+        try(BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\mfab\\Documents\\dev\\manitas.sql"))){
             String contentLine = br.readLine();
             while (contentLine != null) {
                 identifyTable(contentLine);

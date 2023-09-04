@@ -10,4 +10,5 @@ public class Constants {
     public static final String REQUIRED = "PROPERTY IS REQUIRED";
     public static final String ALREADY_EXISTS = "ALREADY EXIST";
     public static final String NOT_FOUND = "NOT FOUND";
+    public static final String NOT_UPDATE = "CAN NOT UPDATE";
 }

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 public class ArticleDto {
+    private String id;
     private String name;
     private String description;
     private String info;

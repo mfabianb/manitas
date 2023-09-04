@@ -7,13 +7,10 @@ import com.manitas.domain.data.repository.UserRepository;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.CatalogService;
 import com.manitas.domain.service.UserService;
-import com.manitas.utils.UtilServlet;
+import com.manitas.utils.UtilPage;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -100,7 +97,7 @@ public class UserServiceImpl implements UserService {
                 userRequestDtoRequestDto.getData().getLastLogin(),
                 userRequestDtoRequestDto.getData().getIdRole(),
                 userRequestDtoRequestDto.getData().getIdUserStatus(),
-                getPage(userRequestDtoRequestDto));
+                UtilPage.getPage(userRequestDtoRequestDto));
 
     }
 
@@ -162,17 +159,6 @@ public class UserServiceImpl implements UserService {
 
         Optional<UserEntity> optionalUserEntity = userRepository.findUserByIdUser(userRequestDto.getIdUser());
         return optionalUserEntity.orElse(null);
-
-    }
-
-    private Pageable getPage(RequestDto<UserRequestDto> userRequestDtoRequestDto){
-
-        if(Boolean.TRUE.equals(userRequestDtoRequestDto.getDescending()))
-            return PageRequest.of(userRequestDtoRequestDto.getPage(), userRequestDtoRequestDto.getSize(),
-                    Sort.by(userRequestDtoRequestDto.getSort()).descending());
-        else
-            return PageRequest.of(userRequestDtoRequestDto.getPage(), userRequestDtoRequestDto.getSize(),
-                    Sort.by(userRequestDtoRequestDto.getSort()).ascending());
 
     }
 
