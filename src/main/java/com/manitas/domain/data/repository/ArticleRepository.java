@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 public interface ArticleRepository extends JpaRepository<ArticleEntity, String> {
 
     @Query("SELECT a FROM ArticleEntity a WHERE " +
-            "(a.name like :name OR :name IS NULL) " +
-            "AND (a.description like :description OR :description IS NULL) " +
-            "AND (a.info like :info OR :info IS NULL) " +
+            "(a.name like %:name%) " +
+            "AND (a.description like %:description%) " +
+            "AND (a.info like %:info%) " +
             "AND (DATE(a.creationDate) = DATE(:creationDate) OR :creationDate IS NULL) " +
             "AND (DATE(a.modificationDate) = DATE(:modificationDate) OR :modificationDate IS NULL) " +
-            "AND (a.idUser.email like :email OR :email IS NULL) " +
+            "AND (a.idUser.email like %:email%) " +
             "AND (a.idTopic.idTopic IN (:idTopic)) " +
             "AND (a.enable = :enable OR :enable IS NULL) ")
     Page<ArticleEntity> getArticlePage(@Param("name") String name,

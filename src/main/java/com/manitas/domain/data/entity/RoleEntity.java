@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Table(name="role")
 @Entity
@@ -17,7 +18,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class RoleEntity {
+public class RoleEntity implements Serializable {
     @Id
     @Column(name="id_role")
     @NotNull

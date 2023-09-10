@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Table(name="question")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class QuestionEntity {
+public class QuestionEntity implements Serializable {
 
     @Id
     @Column(name="id_question")
@@ -36,8 +37,10 @@ public class QuestionEntity {
     @Column(name="modification_date")
     private LocalDateTime modificationDate;
 
-    @Column(name="media")
-    private String media;
+    @NotNull
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "id_media", referencedColumnName = "id_media")
+    private MediaEntity idMedia;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_topic", referencedColumnName = "id_topic")

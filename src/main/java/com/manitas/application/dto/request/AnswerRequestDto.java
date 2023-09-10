@@ -1,4 +1,4 @@
-package com.manitas.application.dto;
+package com.manitas.application.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
@@ -11,15 +11,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class ArticleDto {
-    private String id;
-    private String name;
-    private String description;
-    private String info;
-    private String media;
-    private String email;
+public class AnswerRequestDto {
+    private String idAnswer;
+    private String answer;
+    private MediaRequestDto media;
     private LocalDateTime creationDate;
     private LocalDateTime modificationDate;
     private Boolean enable;
-    private Integer idTopic;
+    private Boolean correct;
 }

@@ -1,18 +1,22 @@
 package com.manitas.domain.service.impl;
 
-import com.manitas.application.dto.ArticleDto;
+import com.manitas.application.dto.request.ArticleRequestDto;
+import com.manitas.application.dto.request.RequestDto;
 import com.manitas.domain.data.entity.ArticleEntity;
+import com.manitas.domain.data.entity.MediaEntity;
 import com.manitas.domain.data.entity.UserEntity;
 import com.manitas.domain.data.repository.ArticleRepository;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.ArticleService;
 import com.manitas.domain.service.CatalogService;
 import com.manitas.domain.service.UserService;
-import jdk.vm.ci.meta.Local;
+import com.manitas.utils.UtilPage;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -35,20 +39,26 @@ public class ArticleServiceImpl implements ArticleService {
     private CatalogService catalogService;
 
     @Override
-    public ArticleEntity createArticle(ArticleDto articleDto) throws BusinessException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public ArticleEntity createArticle(ArticleRequestDto articleRequestDto) throws BusinessException {
 
-        validateMandatoryArticleDto(articleDto);
+        validateMandatoryArticleDto(articleRequestDto);
 
-        return articleRepository.save(
+        return articleRepository.saveAndFlush(
                 ArticleEntity.builder()
                         .idArticle(UUID.randomUUID().toString())
-                        .name(articleDto.getName())
-                        .description(articleDto.getDescription())
-                        .info(articleDto.getInfo())
-                        .media(articleDto.getMedia())
+                        .name(articleRequestDto.getName())
+                        .description(articleRequestDto.getDescription())
+                        .info(articleRequestDto.getInfo())
+                        .idMedia(MediaEntity.builder()
+                                .idMedia(UUID.randomUUID().toString())
+                                .media(articleRequestDto.getMedia().getMedia())
+                                .type(articleRequestDto.getMedia().getType())
+                                .source(articleRequestDto.getMedia().getSource())
+                                .build())
                         .creationDate(LocalDateTime.now())
-                        .idUser(userService.getUserByEmail(articleDto.getEmail()))
-                        .idTopic(catalogService.getTopicById(articleDto.getIdTopic()))
+                        .idUser(userService.getUserByEmail(articleRequestDto.getEmail()))
+                        .idTopic(catalogService.getTopicById(articleRequestDto.getIdTopic()))
                         .enable(Boolean.FALSE)
                         .build()
         );
@@ -56,15 +66,15 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleEntity updateArticle(ArticleDto articleDto) throws BusinessException {
+    public ArticleEntity updateArticle(ArticleRequestDto articleRequestDto) throws BusinessException {
 
-        validateMandatoryArticleDto(articleDto);
+        validateMandatoryArticleDto(articleRequestDto);
 
-        ArticleEntity articleEntity = getArticleById(articleDto.getId());
+        ArticleEntity articleEntity = getArticleById(articleRequestDto.getIdArticle());
 
-        validatePermissionToEdit(articleDto, articleEntity);
+        validatePermissionToEdit(articleRequestDto, articleEntity);
 
-        updateData(articleDto, articleEntity);
+        updateData(articleRequestDto, articleEntity);
 
         return articleRepository.save(articleEntity);
 
@@ -77,30 +87,40 @@ public class ArticleServiceImpl implements ArticleService {
         else throw new BusinessException(ARTICLE + SPACE + NOT_FOUND);
     }
 
-    public Page<ArticleEntity> getPage(){
-        return null;
+    @Override
+    public Page<ArticleEntity> getPage(RequestDto<ArticleRequestDto> articleDto){
+        return articleRepository.getArticlePage(articleDto.getData().getName(), articleDto.getData().getDescription(),
+                articleDto.getData().getInfo(), articleDto.getData().getCreationDate(), articleDto.getData().getModificationDate(),
+                articleDto.getData().getEmail(), articleDto.getData().getIdTopic(), articleDto.getData().getEnable(),
+                UtilPage.getPage(articleDto));
     }
 
-    private void validateMandatoryArticleDto(ArticleDto articleDto) throws BusinessException {
+    private void validateMandatoryArticleDto(ArticleRequestDto articleRequestDto) throws BusinessException {
 
-        if(Objects.isNull(articleDto) || Objects.isNull(articleDto.getName())
-                || Objects.isNull(articleDto.getDescription()) || Objects.isNull(articleDto.getInfo())
-                || Objects.isNull(articleDto.getIdTopic()) || Objects.isNull(articleDto.getEmail()))
+        if(Objects.isNull(articleRequestDto) || Objects.isNull(articleRequestDto.getName())
+                || Objects.isNull(articleRequestDto.getDescription()) || Objects.isNull(articleRequestDto.getInfo())
+                || Objects.isNull(articleRequestDto.getIdTopic()) || Objects.isNull(articleRequestDto.getEmail()))
             throw new BusinessException(SOME + ARTICLE + SPACE + REQUIRED);
 
     }
 
-    private void updateData(ArticleDto dto, ArticleEntity entity){
+    private void updateData(ArticleRequestDto dto, ArticleEntity entity){
 
         boolean result = !entity.getName().equals(dto.getName()) || !entity.getDescription().equals(dto.getDescription())
-                || !entity.getInfo().equals(dto.getInfo()) || !entity.getMedia().equals(dto.getMedia())
+                || !entity.getInfo().equals(dto.getInfo())
                 || !entity.getIdTopic().getIdTopic().equals(dto.getIdTopic()) || !entity.getEnable().equals(dto.getEnable());
 
         if(result) {
             entity.setName(dto.getName());
             entity.setDescription(dto.getDescription());
             entity.setInfo(dto.getInfo());
-            entity.setMedia(dto.getMedia());
+
+            MediaEntity media = entity.getIdMedia();
+            media.setMedia(dto.getMedia().getMedia());
+            media.setSource(dto.getMedia().getSource());
+            media.setType(dto.getMedia().getType());
+
+            entity.setIdMedia(media);
             entity.setModificationDate(LocalDateTime.now());
             entity.setIdTopic(catalogService.getTopicById(dto.getIdTopic()));
             entity.setEnable(dto.getEnable());
@@ -108,7 +128,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     }
 
-    private void validatePermissionToEdit(ArticleDto dto, ArticleEntity entity) throws BusinessException {
+    private void validatePermissionToEdit(ArticleRequestDto dto, ArticleEntity entity) throws BusinessException {
         UserEntity userEntity = userService.getUserByEmail(dto.getEmail());
         if(!entity.getIdUser().getIdUser().equals(userEntity.getIdUser()))
             throw new BusinessException(USER + SPACE + NOT_UPDATE + SPACE + ARTICLE);

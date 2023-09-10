@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Table(name="interpellation")
 @Entity
@@ -15,20 +16,21 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class InterpellationEntity {
+@IdClass(InterpellationKey.class)
+public class InterpellationEntity implements Serializable {
 
     @Id
     @Column(name="id_interpellation")
     @NotNull
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String idInterpellation;
 
+    @Id
     @NotNull
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_question", referencedColumnName = "id_question")
     private QuestionEntity idQuestion;
 
+    @Id
     @NotNull
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_answer", referencedColumnName = "id_answer")

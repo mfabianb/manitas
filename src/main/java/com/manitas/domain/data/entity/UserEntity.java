@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Table(name="user")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class UserEntity {
+public class UserEntity implements Serializable {
 
     @Id
     @Column(name="id_user")

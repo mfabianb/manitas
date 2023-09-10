@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Table(name="user_status")
 @Entity
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class UserStatusEntity {
+public class UserStatusEntity implements Serializable {
     @Id
     @Column(name="id_user_status")
     @NotNull

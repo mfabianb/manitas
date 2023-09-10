@@ -1,6 +1,6 @@
 package com.manitas.application.controller;
 
-import com.manitas.application.dto.UserRequestDto;
+import com.manitas.application.dto.request.UserRequestDto;
 import com.manitas.application.dto.request.RequestDto;
 import com.manitas.application.dto.response.DataResponse;
 import com.manitas.domain.data.entity.UserEntity;
@@ -45,6 +45,7 @@ public class UserController {
 
     @GetMapping("/{idUser}")
     public DataResponse<UserEntity> getUser(@PathVariable(value="idUser") String idUser){
+        log.info("getUser by id {}", idUser);
         try{
             return new DataResponse<>(true, null, HttpStatus.OK.value(), userService.getUser(idUser));
         } catch (BusinessException e) {
@@ -56,6 +57,11 @@ public class UserController {
     @GetMapping
     public DataResponse<Page<UserEntity>> getList(@RequestBody RequestDto<UserRequestDto> requestDto){
         log.info(requestDto);
-        return new DataResponse<>(true, null, HttpStatus.OK.value(), userService.getList(requestDto));
+        try{
+            return new DataResponse<>(true, null, HttpStatus.OK.value(), userService.getList(requestDto));
+        } catch (Exception e) {
+            log.info(e);
+            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Table(name="role_permissions")
 @Entity
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class RolePermissionsEntity {
+public class RolePermissionsEntity implements Serializable {
 
     @Id
     @Column(name="id_role_permissions")
