@@ -21,7 +21,7 @@ public class InterpellationEntity implements Serializable {
 
     @Id
     @Column(name="id_interpellation")
-    @NotNull
+    @NotNull    
     private String idInterpellation;
 
     @Id

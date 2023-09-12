@@ -31,16 +31,12 @@ public class QuestionnaireAnsweredEntity implements Serializable {
     private UserEntity idUser;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumns({
-            @JoinColumn(name = "id_interpellation", referencedColumnName = "id_interpellation"),
-            @JoinColumn(name = "id_question", referencedColumnName = "id_question"),
-            @JoinColumn(name = "id_answer", referencedColumnName = "id_answer")
-    })
+    @JoinColumn(name = "id_questionnaire_blank", referencedColumnName = "id_questionnaire_blank")
     @NotNull
-    private InterpellationEntity idInterpellation;
+    private QuestionnaireBlankEntity idQuestionnaireBlank;
 
     @Column(name="user_answer")
     @NotNull
-    private Boolean userAnswer;
+    private String userAnswer;
 
 }

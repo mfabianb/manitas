@@ -21,8 +21,6 @@ public class QuestionnaireBlankEntity implements Serializable {
     @Id
     @Column(name="id_questionnaire_blank")
     @NotNull
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String idQuestionnaireBlank;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
