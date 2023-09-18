@@ -7,4 +7,6 @@ public interface QuestionnaireService {
     QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException;
 
     QuestionnaireEntity updateQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException;
+
+    QuestionnaireEntity getQuestionnaireById(String id) throws BusinessException;
 }

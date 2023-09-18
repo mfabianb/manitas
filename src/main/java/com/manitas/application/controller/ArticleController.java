@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,47 +22,59 @@ public class ArticleController {
     private ArticleService articleService;
 
     @PostMapping
-    public DataResponse<ArticleEntity> createArticle(@RequestBody ArticleRequestDto articleRequestDto){
+    public ResponseEntity<DataResponse<ArticleEntity>> createArticle(@RequestBody ArticleRequestDto articleRequestDto){
         log.info(articleRequestDto);
+        HttpStatus httpStatus;
         try{
-            return new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.createArticle(articleRequestDto));
+            httpStatus = HttpStatus.OK;
+            return new ResponseEntity<>(new DataResponse<>(true, null, httpStatus.value(), articleService.createArticle(articleRequestDto)), httpStatus);
         }catch (BusinessException e){
             log.info(e);
-            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            return new ResponseEntity<>(new DataResponse<>(false, e.getMessage(), httpStatus.value(), null), httpStatus);
         }
     }
 
     @PutMapping("/{idArticle}")
-    public DataResponse<ArticleEntity> updateArticle(@PathVariable(value = "idArticle") String idArticle, @RequestBody ArticleRequestDto articleRequestDto){
+    public ResponseEntity<DataResponse<ArticleEntity>> updateArticle(@PathVariable(value = "idArticle") String idArticle, @RequestBody ArticleRequestDto articleRequestDto){
+        HttpStatus httpStatus;
         articleRequestDto.setIdArticle(idArticle);
         log.info(articleRequestDto);
         try{
-            return new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.updateArticle(articleRequestDto));
+            httpStatus = HttpStatus.OK;
+            return new ResponseEntity<>(new DataResponse<>(true, null, httpStatus.value(), articleService.updateArticle(articleRequestDto)), httpStatus);
         }catch (BusinessException e){
             log.info(e);
-            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            return new ResponseEntity<>(new DataResponse<>(false, e.getMessage(), httpStatus.value(), null), httpStatus);
         }
     }
 
     @GetMapping("/{idArticle}")
-    public DataResponse<ArticleEntity> getArticle(@PathVariable(value = "idArticle") String idArticle){
+    public ResponseEntity<DataResponse<ArticleEntity>> getArticle(@PathVariable(value = "idArticle") String idArticle){
+        HttpStatus httpStatus;
         log.info("getArticle by id {}", idArticle);
         try{
-            return new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.getArticleById(idArticle));
+            httpStatus = HttpStatus.OK;
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.getArticleById(idArticle)), httpStatus);
         }catch (BusinessException e){
             log.info(e);
-            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            return new ResponseEntity<>(new DataResponse<>(false, e.getMessage(), httpStatus.value(), null), httpStatus);
         }
     }
 
     @GetMapping
-    public DataResponse<Page<ArticleEntity>> getArticleList(@RequestBody RequestDto<ArticleRequestDto> articleDtoDataResponse){
+    public ResponseEntity<DataResponse<Page<ArticleEntity>>> getArticleList(@RequestBody RequestDto<ArticleRequestDto> articleDtoDataResponse){
         log.info(articleDtoDataResponse);
+        HttpStatus httpStatus;
         try{
-            return new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.getPage(articleDtoDataResponse));
+            httpStatus = HttpStatus.OK;
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.getPage(articleDtoDataResponse)), httpStatus);
         }catch (Exception e){
             log.info(e);
-            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            return new ResponseEntity<>(new DataResponse<>(false, e.getMessage(), httpStatus.value(), null), httpStatus);
         }
     }
 

@@ -10,7 +10,7 @@ import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.ArticleService;
 import com.manitas.domain.service.CatalogService;
 import com.manitas.domain.service.UserService;
-import com.manitas.utils.UtilPage;
+import com.manitas.utils.PageUtility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -92,7 +92,7 @@ public class ArticleServiceImpl implements ArticleService {
         return articleRepository.getArticlePage(articleDto.getData().getName(), articleDto.getData().getDescription(),
                 articleDto.getData().getInfo(), articleDto.getData().getCreationDate(), articleDto.getData().getModificationDate(),
                 articleDto.getData().getEmail(), articleDto.getData().getIdTopic(), articleDto.getData().getEnable(),
-                UtilPage.getPage(articleDto));
+                PageUtility.getPage(articleDto));
     }
 
     private void validateMandatoryArticleDto(ArticleRequestDto articleRequestDto) throws BusinessException {

@@ -8,9 +8,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
-public class UtilServlet {
+public class ServletUtility {
 
-    private UtilServlet() {
+    private ServletUtility() {
         throw new IllegalStateException("Utility class");
     }
     
@@ -24,7 +24,7 @@ public class UtilServlet {
 
     public static String getToken() {
         String authToken = null;
-        HttpServletRequest context = UtilServlet.getCurrentHttpRequest();
+        HttpServletRequest context = ServletUtility.getCurrentHttpRequest();
         if (Objects.nonNull( context )) {
             authToken = context.getHeader(HttpHeaders.AUTHORIZATION);
         }

@@ -5,9 +5,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-public class UtilPage {
+public class PageUtility {
 
-    private UtilPage(){}
+    private PageUtility(){}
 
     public static Pageable getPage(RequestDto<?> requestDto){
         if(Boolean.TRUE.equals(requestDto.getDescending()))

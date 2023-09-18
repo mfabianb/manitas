@@ -3,7 +3,6 @@ package com.manitas.domain.data.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -29,11 +28,9 @@ public class QuestionnaireBlankEntity implements Serializable {
     private QuestionnaireEntity idQuestionnaire;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumns({
-            @JoinColumn(name = "id_interpellation", referencedColumnName = "id_interpellation"),
-            @JoinColumn(name = "id_question", referencedColumnName = "id_question"),
-            @JoinColumn(name = "id_answer", referencedColumnName = "id_answer")
-    })
+    @JoinColumn(name = "id_interpellation", referencedColumnName = "id_interpellation")
+    @JoinColumn(name = "id_question", referencedColumnName = "id_question")
+    @JoinColumn(name = "id_answer", referencedColumnName = "id_answer")
     @NotNull
     private InterpellationEntity idInterpellation;
 

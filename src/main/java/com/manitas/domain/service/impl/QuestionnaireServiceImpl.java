@@ -36,7 +36,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                         .name(questionnaireEntity.getName())
                         .description(questionnaireEntity.getDescription())
                         .creationDate(LocalDateTime.now())
-                        .enable(Boolean.TRUE)
+                        .enable(Boolean.FALSE)
                         .build()
         );
 
@@ -62,6 +62,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             throw new BusinessException(SOME + QUESTIONNAIRE + SPACE + REQUIRED);
     }
 
+    @Override
     public QuestionnaireEntity getQuestionnaireById(String id) throws BusinessException {
         Optional<QuestionnaireEntity> optionalQuestionnaireEntity = questionnaireRepository.findById(id);
         if(optionalQuestionnaireEntity.isPresent()) return optionalQuestionnaireEntity.get();

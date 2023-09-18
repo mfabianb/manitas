@@ -2,6 +2,8 @@ package com.manitas.domain.service.impl;
 
 import com.manitas.application.dto.request.AnswerRequestDto;
 import com.manitas.application.dto.request.InterpellationRequestDto;
+import com.manitas.application.dto.request.RequestDto;
+import com.manitas.application.dto.response.InterpellationResponseDto;
 import com.manitas.domain.data.entity.InterpellationEntity;
 import com.manitas.domain.data.entity.QuestionEntity;
 import com.manitas.domain.data.repository.InterpellationRepository;
@@ -9,8 +11,14 @@ import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.AnswerService;
 import com.manitas.domain.service.InterpellationService;
 import com.manitas.domain.service.QuestionService;
+import com.manitas.utils.InterpellationUtility;
+import com.manitas.utils.PageUtility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,16 +122,37 @@ public class InterpellationServiceImpl implements InterpellationService {
 
     }
 
-    public InterpellationEntity getInterpellationById(String id) throws BusinessException {
-        Optional<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.findById(id);
-        if(optionalInterpellationEntity.isPresent()) return optionalInterpellationEntity.get();
-        else throw new BusinessException(SOME + INTERPELLATION + SPACE + REQUIRED);
-    }
-
+    @Override
     public List<InterpellationEntity> getAllInterpellationById(String id) throws BusinessException {
         List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.getAllById(id);
         if(!optionalInterpellationEntity.isEmpty()) return optionalInterpellationEntity;
         else throw new BusinessException(SOME + INTERPELLATION + SPACE + REQUIRED);
+    }
+
+    @Override
+    public InterpellationResponseDto getInterpellationResponseDtoById(String id) throws BusinessException {
+        List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.getAllById(id);
+        if(!optionalInterpellationEntity.isEmpty()){
+            return InterpellationUtility.entityToResponseDto(optionalInterpellationEntity);
+        }
+        else throw new BusinessException(SOME + SPACE + INTERPELLATION + SPACE + REQUIRED);
+    }
+
+    @Override
+    public Page<InterpellationResponseDto> getAllInterpellationDto(RequestDto<InterpellationRequestDto> requestDto){
+
+        Page<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.findAllEntityPage(requestDto.getData().getQuestion().getQuestion(),
+                requestDto.getData().getQuestion().getCreationDate(), requestDto.getData().getQuestion().getMedia().getType(),
+                Boolean.TRUE, requestDto.getData().getQuestion().getEnable(), PageUtility.getPage(requestDto));
+
+        List<InterpellationResponseDto> interpellationResponseDtoList
+                = new ArrayList<>(InterpellationUtility.entityListToResponseDtoList(optionalInterpellationEntity.getContent()));
+
+        int totalSize = (interpellationResponseDtoList.isEmpty()) ? 1 : interpellationResponseDtoList.size();
+
+        Pageable pageRequest = createPageRequestUsing(requestDto.getPage(), totalSize);
+        return new PageImpl<>(interpellationResponseDtoList, pageRequest, interpellationResponseDtoList.size());
+
     }
 
     private void updateData(InterpellationRequestDto request, InterpellationEntity entity){
@@ -147,5 +176,10 @@ public class InterpellationServiceImpl implements InterpellationService {
         if(correct != 1 && answers != 4) throw new BusinessException(INTERPELLATION  + " NEEDS TO HAVE ONLY ONE CORRECT ANSWER, AND FOUR POSSIBLE ANSWERS");
 
     }
+
+    private Pageable createPageRequestUsing(int page, int size) {
+        return PageRequest.of(page, size);
+    }
+
 
 }

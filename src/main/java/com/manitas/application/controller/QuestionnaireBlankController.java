@@ -21,7 +21,7 @@ public class QuestionnaireBlankController {
     private QuestionnaireBlankService questionnaireBlankService;
 
     @PostMapping
-    public DataResponse<?> createQuestionnaireBlank(@RequestBody QuestionnaireBlankDto questionnaireBlankDto){
+    public DataResponse<Object> createQuestionnaireBlank(@RequestBody QuestionnaireBlankDto questionnaireBlankDto){
         try{
             questionnaireBlankService.createQuestionnaire(questionnaireBlankDto);
             return new DataResponse<>(true, null, HttpStatus.OK.value(), null);

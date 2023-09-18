@@ -7,7 +7,7 @@ import com.manitas.domain.data.repository.UserRepository;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.CatalogService;
 import com.manitas.domain.service.UserService;
-import com.manitas.utils.UtilPage;
+import com.manitas.utils.PageUtility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
                 userRequestDtoRequestDto.getData().getLastLogin(),
                 userRequestDtoRequestDto.getData().getIdRole(),
                 userRequestDtoRequestDto.getData().getIdUserStatus(),
-                UtilPage.getPage(userRequestDtoRequestDto));
+                PageUtility.getPage(userRequestDtoRequestDto));
 
     }
 
