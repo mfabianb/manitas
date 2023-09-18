@@ -7,10 +7,7 @@ import com.manitas.domain.service.InterpellationService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Log4j2
@@ -24,6 +21,19 @@ public class InterpellationController {
     public DataResponse<?> createInterpellation(@RequestBody InterpellationRequestDto interpellationRequestDto){
         try{
             interpellationService.createInterpellation(interpellationRequestDto);
+            return new DataResponse<>(true, null, HttpStatus.OK.value(), null);
+        }catch (BusinessException e){
+            log.info(e);
+            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+        }
+    }
+
+    @PutMapping("/{idInterpellation}")
+    public DataResponse<?> updateInterpellation(@PathVariable(value="idInterpellation") String idInterpellation,
+                                                @RequestBody InterpellationRequestDto interpellationRequestDto){
+        try{
+            interpellationRequestDto.setIdInterpellation(idInterpellation);
+            interpellationService.updateInterpellation(interpellationRequestDto);
             return new DataResponse<>(true, null, HttpStatus.OK.value(), null);
         }catch (BusinessException e){
             log.info(e);

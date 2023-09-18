@@ -2,7 +2,6 @@ package com.manitas.domain.service.impl;
 
 import com.manitas.application.dto.request.AnswerRequestDto;
 import com.manitas.application.dto.request.InterpellationRequestDto;
-import com.manitas.domain.data.entity.AnswerEntity;
 import com.manitas.domain.data.entity.InterpellationEntity;
 import com.manitas.domain.data.entity.QuestionEntity;
 import com.manitas.domain.data.repository.InterpellationRepository;
@@ -35,9 +34,13 @@ public class InterpellationServiceImpl implements InterpellationService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void createInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
+    public InterpellationEntity createInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
+
+        validateCorrectAnswer(interpellationRequestDto.getAnswers());
 
         List<InterpellationEntity> interpellationEntityList = new ArrayList<>();
+
+        List<InterpellationEntity> result = new ArrayList<>();
 
         String unique = UUID.randomUUID().toString();
         log.info("Generated unique: {}", unique);
@@ -59,12 +62,14 @@ public class InterpellationServiceImpl implements InterpellationService {
         });
 
         try {
-            interpellationRepository.saveAll(interpellationEntityList);
+            result.addAll(interpellationRepository.saveAll(interpellationEntityList));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         log.info("Interpellation with id {} saved", unique);
+
+        return result.get(0);
 
     }
 
@@ -72,7 +77,12 @@ public class InterpellationServiceImpl implements InterpellationService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void updateInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
 
+        validateCorrectAnswer(interpellationRequestDto.getAnswers());
+
         List<InterpellationEntity> interpellationEntityList = getAllInterpellationById(interpellationRequestDto.getIdInterpellation());
+
+        interpellationRequestDto.getQuestion().setIdQuestion(interpellationEntityList.get(0).getIdQuestion().getIdQuestion());
+
         QuestionEntity questionEntity = questionService.updateQuestion(interpellationRequestDto.getQuestion());
 
         interpellationEntityList.forEach(i->{
@@ -123,6 +133,18 @@ public class InterpellationServiceImpl implements InterpellationService {
         if(result){
             entity.setEnable(request.getEnable());
         }
+
+    }
+
+    private void validateCorrectAnswer(List<AnswerRequestDto> answerRequestDto) throws BusinessException {
+
+        int correct = 0;
+        int answers = 0;
+        for(AnswerRequestDto a: answerRequestDto){
+            answers++;
+            if(Boolean.TRUE.equals(a.getCorrect())) correct++;
+        }
+        if(correct != 1 && answers != 4) throw new BusinessException(INTERPELLATION  + " NEEDS TO HAVE ONLY ONE CORRECT ANSWER, AND FOUR POSSIBLE ANSWERS");
 
     }
 

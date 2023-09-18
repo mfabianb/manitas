@@ -7,6 +7,8 @@ import com.manitas.domain.service.QuestionnaireService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -23,6 +25,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private QuestionnaireRepository questionnaireRepository;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException {
 
         validateMandatory(questionnaireEntity);
@@ -40,6 +43,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public QuestionnaireEntity updateQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException {
 
         validateMandatory(questionnaireEntity);
