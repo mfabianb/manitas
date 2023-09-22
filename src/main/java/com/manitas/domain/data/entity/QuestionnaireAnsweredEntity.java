@@ -39,4 +39,7 @@ public class QuestionnaireAnsweredEntity implements Serializable {
     @NotNull
     private String userAnswer;
 
+    @Column(name = "blank_key")
+    private String blankKey;
+
 }

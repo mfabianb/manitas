@@ -1,6 +1,7 @@
 package com.manitas.application.controller;
 
-import com.manitas.application.dto.request.QuestionnaireBlankDto;
+import com.manitas.application.dto.request.QuestionnaireManualBlankDto;
+import com.manitas.application.dto.request.QuestionnaireSteadyRequestDto;
 import com.manitas.application.dto.response.DataResponse;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.QuestionnaireBlankService;
@@ -21,9 +22,34 @@ public class QuestionnaireBlankController {
     private QuestionnaireBlankService questionnaireBlankService;
 
     @PostMapping
-    public DataResponse<Object> createQuestionnaireBlank(@RequestBody QuestionnaireBlankDto questionnaireBlankDto){
+    public DataResponse<Object> createQuestionnaireData(@RequestBody QuestionnaireManualBlankDto questionnaireManualBlankDto){
+        log.info(questionnaireManualBlankDto);
         try{
-            questionnaireBlankService.createQuestionnaire(questionnaireBlankDto);
+            questionnaireBlankService.createQuestionnaireData(questionnaireManualBlankDto.getQuestionnaire());
+            return new DataResponse<>(true, null, HttpStatus.OK.value(), null);
+        }catch (BusinessException e){
+            log.info(e);
+            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+        }
+    }
+
+    @PostMapping("/manual")
+    public DataResponse<Object> createQuestionnaireBlank(@RequestBody QuestionnaireManualBlankDto questionnaireManualBlankDto){
+        log.info(questionnaireManualBlankDto);
+        try{
+            questionnaireBlankService.createQuestionnaireAndInterpellations(questionnaireManualBlankDto);
+            return new DataResponse<>(true, null, HttpStatus.OK.value(), null);
+        }catch (BusinessException e){
+            log.info(e);
+            return new DataResponse<>(false, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+        }
+    }
+
+    @PostMapping("/steady")
+    public DataResponse<Object> createQuestionnaireSteadyBlank(@RequestBody QuestionnaireSteadyRequestDto questionnaireSteadyRequestDto){
+        log.info(questionnaireSteadyRequestDto);
+        try{
+            questionnaireBlankService.createQuestionnaireByIdInterpellations(questionnaireSteadyRequestDto);
             return new DataResponse<>(true, null, HttpStatus.OK.value(), null);
         }catch (BusinessException e){
             log.info(e);

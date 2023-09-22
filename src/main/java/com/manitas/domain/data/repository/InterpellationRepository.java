@@ -31,4 +31,6 @@ public interface InterpellationRepository extends JpaRepository<InterpellationEn
                                                  @Param("topicEnable") Boolean topicEnable,
                                                  @Param("enable") Boolean enable,
                                                  Pageable pageable);
+
+    List<InterpellationEntity> findAllByInterpellationKey(String interpellationKey);
 }

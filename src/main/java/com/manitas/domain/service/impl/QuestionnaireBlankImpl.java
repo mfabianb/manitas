@@ -1,6 +1,7 @@
 package com.manitas.domain.service.impl;
 
-import com.manitas.application.dto.request.QuestionnaireBlankDto;
+import com.manitas.application.dto.request.QuestionnaireManualBlankDto;
+import com.manitas.application.dto.request.QuestionnaireSteadyRequestDto;
 import com.manitas.application.dto.request.RequestDto;
 import com.manitas.domain.data.entity.*;
 import com.manitas.domain.data.repository.QuestionnaireBlankRepository;
@@ -36,15 +37,15 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void createQuestionnaire(QuestionnaireBlankDto questionnaireBlankDto) throws BusinessException {
+    public void createQuestionnaireAndInterpellations(QuestionnaireManualBlankDto questionnaireManualBlankDto) throws BusinessException {
 
-        QuestionnaireEntity questionnaireEntity = questionnaireService.createQuestionnaireData(questionnaireBlankDto.getQuestionnaire());
+        QuestionnaireEntity questionnaireEntity = questionnaireService.createQuestionnaireData(questionnaireManualBlankDto.getQuestionnaire());
 
         List<InterpellationEntity> interpellationEntities = new ArrayList<>();
 
-        questionnaireBlankDto.getInterpellations().forEach(interpellationRequestDto -> {
+        questionnaireManualBlankDto.getInterpellations().forEach(interpellationRequestDto -> {
             try {
-                interpellationEntities.add(interpellationService.createInterpellation(interpellationRequestDto));
+                interpellationEntities.addAll(interpellationService.createInterpellation(interpellationRequestDto));
             } catch (BusinessException e) {
                 e.printStackTrace();
             }
@@ -54,23 +55,67 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
 
         StringBuilder stringBuilder = new StringBuilder();
 
+        String unique = UUID.randomUUID().toString();
+        log.info("Generated unique: {}", unique);
+
         interpellationEntities.forEach(i ->{
             stringBuilder.append(i.getIdQuestion().getIdTopic().getName()).append(",");
             questionnaireBlankEntities.add(QuestionnaireBlankEntity.builder()
                     .idQuestionnaireBlank(UUID.randomUUID().toString())
                     .idQuestionnaire(questionnaireEntity)
                     .idInterpellation(i)
+                    .blankKey(unique)
+                    .interpellationKey(i.getInterpellationKey())
                     .build());
         });
 
         questionnaireEntity.setEnable(Boolean.TRUE);
         questionnaireEntity.setModificationDate(LocalDateTime.now());
-        questionnaireEntity.setLength(questionnaireBlankEntities.size());
+        questionnaireEntity.setLength(questionnaireBlankEntities.size()/4);
         questionnaireEntity.setTopic(stringBuilder.substring(0, stringBuilder.toString().length() - 1));
 
-        questionnaireBlankRepository.saveAll(questionnaireBlankEntities);
+        List<QuestionnaireBlankEntity> questionnaireBlankEntity = questionnaireBlankRepository.saveAll(questionnaireBlankEntities);
+
+        log.info("questionnaireBlankEntity.size(): {}", questionnaireBlankEntity.size());
 
         log.info("Se ha guardado el cuestionario por responder");
+
+    }
+
+    @Override
+    public void createQuestionnaireByIdInterpellations(QuestionnaireSteadyRequestDto questionnaireDto) throws BusinessException {
+
+        String uniqueKey = UUID.randomUUID().toString();
+
+        log.info("SE VA A CREAR EL CUESTIONARIO EN BLANCO CON EL ID: {}", uniqueKey);
+
+        QuestionnaireEntity questionnaireEntity = questionnaireService.getQuestionnaireById(questionnaireDto.getIdQuestionnaire());
+        List<InterpellationEntity> interpellationEntityList = new ArrayList<>();
+        List<QuestionnaireBlankEntity> questionnaireBlankEntityList = new ArrayList<>();
+
+        questionnaireDto.getIdInterpellations().forEach(q->{
+            try {
+                interpellationEntityList.addAll(interpellationService.getAllInterpellationByKey(q));
+            } catch (BusinessException e) {
+                log.info("ERROR AL AGREGAR UN REACTIVO: " + q + "," + ": " + e.getMessage());
+            }
+        });
+
+        log.info("interpellationEntityList.size(): {}", interpellationEntityList.size());
+
+        interpellationEntityList.forEach(i->{
+            questionnaireBlankEntityList.add(QuestionnaireBlankEntity.builder()
+                    .idQuestionnaireBlank(UUID.randomUUID().toString())
+                    .idQuestionnaire(questionnaireEntity)
+                    .idInterpellation(i)
+                    .interpellationKey(i.getInterpellationKey())
+                    .blankKey(uniqueKey)
+                    .build());
+        });
+
+        questionnaireBlankRepository.saveAll(questionnaireBlankEntityList);
+
+        log.info("SE CREÓ EL CUESTIONARIO EN BLANCO CON EL ID: {}", uniqueKey);
 
     }
 
@@ -87,6 +132,11 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
         return questionnaireBlankRepository.getInterpellationsByIdQuestionnaire(
                 questionnaireService.getQuestionnaireById(idQuestionnaire), PageUtility.getPage(requestDto));
 
+    }
+
+    @Override
+    public QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException {
+        return questionnaireService.createQuestionnaireData(questionnaireEntity);
     }
 
 }

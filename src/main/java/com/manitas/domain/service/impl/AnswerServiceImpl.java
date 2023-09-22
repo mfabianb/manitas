@@ -32,8 +32,10 @@ public class AnswerServiceImpl implements AnswerService {
 
         validateMandatoryAnswerDto(answerRequestDto);
 
+        String uniqueKey = UUID.randomUUID().toString();
+
         return answerRepository.saveAndFlush(AnswerEntity.builder()
-                        .idAnswer(UUID.randomUUID().toString())
+                        .idAnswer(uniqueKey)
                         .answer(answerRequestDto.getAnswer())
                         .idMedia(MediaEntity.builder()
                                 .idMedia(UUID.randomUUID().toString())
@@ -42,7 +44,7 @@ public class AnswerServiceImpl implements AnswerService {
                                 .type(answerRequestDto.getMedia().getType())
                                 .build())
                         .creationDate(LocalDateTime.now())
-                        .enable(Boolean.FALSE)
+                        .enable(Boolean.TRUE)
                 .build());
 
     }

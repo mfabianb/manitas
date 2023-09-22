@@ -42,7 +42,7 @@ public class InterpellationServiceImpl implements InterpellationService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public InterpellationEntity createInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
+    public List<InterpellationEntity> createInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
 
         validateCorrectAnswer(interpellationRequestDto.getAnswers());
 
@@ -58,11 +58,12 @@ public class InterpellationServiceImpl implements InterpellationService {
         interpellationRequestDto.getAnswers().forEach(a->{
             try {
                 interpellationEntityList.add(InterpellationEntity.builder()
-                        .idInterpellation(unique)
-                        .enable(Boolean.FALSE)
+                        .idInterpellation(UUID.randomUUID().toString())
+                        .enable(Boolean.TRUE)
                         .idQuestion(questionEntity)
                         .idAnswer(answerService.createAnswer(a))
                         .correct(a.getCorrect())
+                        .interpellationKey(unique)
                         .build());
             } catch (BusinessException e) {
                 e.printStackTrace();
@@ -75,9 +76,9 @@ public class InterpellationServiceImpl implements InterpellationService {
             e.printStackTrace();
         }
 
-        log.info("Interpellation with id {} saved", unique);
+        log.info("Interpellation saved");
 
-        return result.get(0);
+        return result;
 
     }
 
@@ -87,7 +88,7 @@ public class InterpellationServiceImpl implements InterpellationService {
 
         validateCorrectAnswer(interpellationRequestDto.getAnswers());
 
-        List<InterpellationEntity> interpellationEntityList = getAllInterpellationById(interpellationRequestDto.getIdInterpellation());
+        List<InterpellationEntity> interpellationEntityList = getAllInterpellationByKey(interpellationRequestDto.getIdInterpellation());
 
         interpellationRequestDto.getQuestion().setIdQuestion(interpellationEntityList.get(0).getIdQuestion().getIdQuestion());
 
@@ -153,6 +154,13 @@ public class InterpellationServiceImpl implements InterpellationService {
         Pageable pageRequest = createPageRequestUsing(requestDto.getPage(), totalSize);
         return new PageImpl<>(interpellationResponseDtoList, pageRequest, interpellationResponseDtoList.size());
 
+    }
+
+    @Override
+    public List<InterpellationEntity> getAllInterpellationByKey(String id) throws BusinessException {
+        List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.findAllByInterpellationKey(id);
+        if(!optionalInterpellationEntity.isEmpty()) return optionalInterpellationEntity;
+        else throw new BusinessException(SOME + INTERPELLATION + SPACE + REQUIRED);
     }
 
     private void updateData(InterpellationRequestDto request, InterpellationEntity entity){

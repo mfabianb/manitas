@@ -59,7 +59,7 @@ public class ArticleServiceImpl implements ArticleService {
                         .creationDate(LocalDateTime.now())
                         .idUser(userService.getUserByEmail(articleRequestDto.getEmail()))
                         .idTopic(catalogService.getTopicById(articleRequestDto.getIdTopic()))
-                        .enable(Boolean.FALSE)
+                        .enable(Boolean.TRUE)
                         .build()
         );
 

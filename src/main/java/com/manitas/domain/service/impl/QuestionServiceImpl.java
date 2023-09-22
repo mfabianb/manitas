@@ -36,8 +36,10 @@ public class QuestionServiceImpl implements QuestionService {
 
         validateMandatoryQuestionDto(questionRequestDto);
 
+        String uniqueKey = UUID.randomUUID().toString();
+
         return questionRepository.saveAndFlush(QuestionEntity.builder()
-                .idQuestion(UUID.randomUUID().toString())
+                .idQuestion(uniqueKey)
                 .question(questionRequestDto.getQuestion())
                 .idMedia(MediaEntity.builder()
                         .idMedia(UUID.randomUUID().toString())
@@ -47,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
                         .build())
                 .creationDate(LocalDateTime.now())
                 .idTopic(catalogService.getTopicById(questionRequestDto.getIdTopic()))
-                .enable(Boolean.FALSE)
+                .enable(Boolean.TRUE)
                 .build());
 
     }

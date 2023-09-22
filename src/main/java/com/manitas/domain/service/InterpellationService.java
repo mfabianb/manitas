@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface InterpellationService {
-    InterpellationEntity createInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException;
+    List<InterpellationEntity> createInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     void updateInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException;
@@ -22,4 +22,6 @@ public interface InterpellationService {
     InterpellationResponseDto getInterpellationResponseDtoById(String id) throws BusinessException;
 
     Page<InterpellationResponseDto> getAllInterpellationDto(RequestDto<InterpellationRequestDto> requestDto);
+
+    List<InterpellationEntity> getAllInterpellationByKey(String id) throws BusinessException;
 }

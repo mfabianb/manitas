@@ -36,7 +36,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                         .name(questionnaireEntity.getName())
                         .description(questionnaireEntity.getDescription())
                         .creationDate(LocalDateTime.now())
-                        .enable(Boolean.FALSE)
+                        .enable(Boolean.TRUE)
                         .build()
         );
 
