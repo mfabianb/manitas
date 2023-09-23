@@ -87,6 +87,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity updateUserEntity(UserEntity idUser) throws BusinessException {
+        return userRepository.save(idUser);
+    }
+
+    @Override
+    public UserEntity getUserEntity(String idUser) throws BusinessException {
+
+        Optional<UserEntity> userEntity = userRepository.findUserByIdUser(idUser);
+
+        log.info(userEntity.get().getIdUser());
+
+        if(userEntity.isPresent()) return userEntity.get();
+        else throw new BusinessException(USER + SPACE + NOT_FOUND);
+
+    }
+
+    @Override
     public Page<UserResponseDto> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto){
 
         return userRepository.findPageDtoByFilter(
@@ -110,6 +127,17 @@ public class UserServiceImpl implements UserService {
         if(userEntity.isPresent()) return userEntity.get();
         else throw new BusinessException(USER + SPACE + NOT_FOUND);
 
+    }
+
+    @Override
+    public UserEntity getUserByCredentials(String username, String password) throws BusinessException {
+        Optional<UserEntity> userEntity = userRepository.findUserByEmailAndPassword(username, password);
+
+        if(!userEntity.isPresent() || userEntity.get().getIdUserStatus().getIdUserStatus() != 101){
+            throw new BusinessException(UNAUTHORIZED);
+        }
+
+        return userEntity.get();
     }
 
     private void updateData(UserEntity userEntity, UserRequestDto userRequestDto){

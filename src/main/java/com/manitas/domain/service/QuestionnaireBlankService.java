@@ -1,8 +1,6 @@
 package com.manitas.domain.service;
 
-import com.manitas.application.dto.request.QuestionnaireDynamicBlankDto;
-import com.manitas.application.dto.request.QuestionnaireManualBlankDto;
-import com.manitas.application.dto.request.QuestionnaireSteadyRequestDto;
+import com.manitas.application.dto.request.*;
 import com.manitas.domain.data.entity.InterpellationEntity;
 import com.manitas.domain.data.entity.QuestionnaireEntity;
 import com.manitas.domain.exception.BusinessException;
@@ -21,4 +19,6 @@ public interface QuestionnaireBlankService {
     Page<InterpellationEntity> getInterpellationByQuestionnaire(String idQuestionnaire) throws BusinessException;
 
     QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException;
+
+    Page<QuestionnaireEntity> getQuestionnairePage(RequestDto<QuestionnaireBlankRequestDto> requestDto) throws BusinessException;
 }

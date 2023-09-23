@@ -14,7 +14,13 @@ public interface UserService {
 
     UserResponseDto getUser(String idUser) throws BusinessException;
 
+    UserEntity updateUserEntity(UserEntity idUser) throws BusinessException;
+
+    UserEntity getUserEntity(String idUser) throws BusinessException;
+
     Page<UserResponseDto> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto);
 
     UserEntity getUserByEmail(String email) throws BusinessException;
+
+    UserEntity getUserByCredentials(String username, String password) throws BusinessException;
 }

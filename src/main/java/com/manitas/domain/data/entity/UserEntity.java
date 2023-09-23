@@ -65,4 +65,12 @@ public class UserEntity implements Serializable {
     @NotNull
     private RoleEntity idRole;
 
+    @Basic
+    @Column(name = "token")
+    private String token;
+
+    @Basic
+    @Column(name = "token_enable")
+    private Boolean tokenEnable;
+
 }

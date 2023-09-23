@@ -1,6 +1,5 @@
 package com.manitas.utils;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,11 +22,19 @@ public class ServletUtility {
     }
 
     public static String getToken() {
-        String authToken = null;
-        HttpServletRequest context = ServletUtility.getCurrentHttpRequest();
-        if (Objects.nonNull( context )) {
-            authToken = context.getHeader(HttpHeaders.AUTHORIZATION);
+        StringBuilder authToken = new StringBuilder();
+
+        HttpServletRequest httpServletRequest = null;
+
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes) {
+            httpServletRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
         }
-        return authToken;
+
+        if (Objects.nonNull(httpServletRequest)) {
+            authToken.append(httpServletRequest.getHeader("token"));
+        }
+
+        return authToken.toString();
     }
 }

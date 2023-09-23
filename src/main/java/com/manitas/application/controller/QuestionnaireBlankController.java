@@ -1,20 +1,16 @@
 package com.manitas.application.controller;
 
-import com.manitas.application.dto.request.QuestionnaireDynamicBlankDto;
-import com.manitas.application.dto.request.QuestionnaireManualBlankDto;
-import com.manitas.application.dto.request.QuestionnaireSteadyRequestDto;
+import com.manitas.application.dto.request.*;
 import com.manitas.application.dto.response.DataResponse;
 import com.manitas.domain.data.entity.QuestionnaireEntity;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.QuestionnaireBlankService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Log4j2
@@ -23,6 +19,18 @@ public class QuestionnaireBlankController {
 
     @Autowired
     private QuestionnaireBlankService questionnaireBlankService;
+
+    @GetMapping
+    public ResponseEntity<DataResponse<Page<QuestionnaireEntity>>> getQuestionnairePage(@RequestBody RequestDto<QuestionnaireBlankRequestDto> requestDto){
+        log.info(requestDto);
+        try{
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(),
+                    questionnaireBlankService.getQuestionnairePage(requestDto)) , HttpStatus.OK);
+        }catch (Exception e){
+            log.info(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping
     public ResponseEntity<DataResponse<QuestionnaireEntity>> createQuestionnaireData(@RequestBody QuestionnaireManualBlankDto questionnaireManualBlankDto){
@@ -62,6 +70,42 @@ public class QuestionnaireBlankController {
 
     @PostMapping("/dynamic")
     public ResponseEntity<DataResponse<Object>> createQuestionnaireDynamicBlank(@RequestBody QuestionnaireDynamicBlankDto questionnaireDynamicBlankDto){
+        log.info(questionnaireDynamicBlankDto);
+        try{
+            questionnaireBlankService.createQuestionnaireDynamic(questionnaireDynamicBlankDto);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
+        }catch (BusinessException e){
+            log.info(e);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{key}")
+    public ResponseEntity<DataResponse<Object>> getQuestionnaireByKey(@RequestBody QuestionnaireDynamicBlankDto questionnaireDynamicBlankDto){
+        log.info(questionnaireDynamicBlankDto);
+        try{
+            questionnaireBlankService.createQuestionnaireDynamic(questionnaireDynamicBlankDto);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
+        }catch (BusinessException e){
+            log.info(e);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/blank/{blankKey}")
+    public ResponseEntity<DataResponse<Object>> getQuestionnaireBlankByKey(@RequestBody QuestionnaireDynamicBlankDto questionnaireDynamicBlankDto){
+        log.info(questionnaireDynamicBlankDto);
+        try{
+            questionnaireBlankService.createQuestionnaireDynamic(questionnaireDynamicBlankDto);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
+        }catch (BusinessException e){
+            log.info(e);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/reply")
+    public ResponseEntity<DataResponse<Object>> replyQuestionnaire(@RequestBody QuestionnaireDynamicBlankDto questionnaireDynamicBlankDto){
         log.info(questionnaireDynamicBlankDto);
         try{
             questionnaireBlankService.createQuestionnaireDynamic(questionnaireDynamicBlankDto);

@@ -20,6 +20,9 @@ public interface UserRepository extends JpaRepository<UserEntity, String>, JpaSp
     Optional<UserEntity> findUserByEmail(String email);
     Optional<UserEntity> findUserByIdUser(String idUser);
 
+    @Query("SELECT u FROM UserEntity u WHERE u.email = :email AND u.password = :password")
+    Optional<UserEntity> findUserByEmailAndPassword(@Param("email") String email, @Param("password")String password);
+
     @Query("SELECT u FROM UserEntity u WHERE " +
             "(u.email LIKE %:email%) " +
             "AND (u.name LIKE %:name%) " +

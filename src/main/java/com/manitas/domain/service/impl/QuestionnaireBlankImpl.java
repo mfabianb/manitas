@@ -1,9 +1,6 @@
 package com.manitas.domain.service.impl;
 
-import com.manitas.application.dto.request.QuestionnaireDynamicBlankDto;
-import com.manitas.application.dto.request.QuestionnaireManualBlankDto;
-import com.manitas.application.dto.request.QuestionnaireSteadyRequestDto;
-import com.manitas.application.dto.request.RequestDto;
+import com.manitas.application.dto.request.*;
 import com.manitas.domain.data.entity.*;
 import com.manitas.domain.data.repository.QuestionnaireBlankRepository;
 import com.manitas.domain.exception.BusinessException;
@@ -204,6 +201,11 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
         topics.forEach(t -> stringBuilder.append(t).append(","));
         return stringBuilder.substring(0, stringBuilder.toString().length() - 1);
 
+    }
+
+    @Override
+    public Page<QuestionnaireEntity> getQuestionnairePage(RequestDto<QuestionnaireBlankRequestDto> requestDto) throws BusinessException{
+        return questionnaireService.getQuestionnairePage(requestDto);
     }
 
 }
