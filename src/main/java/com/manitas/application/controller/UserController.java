@@ -3,6 +3,7 @@ package com.manitas.application.controller;
 import com.manitas.application.dto.request.UserRequestDto;
 import com.manitas.application.dto.request.RequestDto;
 import com.manitas.application.dto.response.DataResponse;
+import com.manitas.application.dto.response.UserResponseDto;
 import com.manitas.domain.data.entity.UserEntity;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.UserService;
@@ -22,7 +23,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<DataResponse<UserEntity>> createUser(@RequestBody UserRequestDto userRequestDto){
+    public ResponseEntity<DataResponse<UserResponseDto>> createUser(@RequestBody UserRequestDto userRequestDto){
         HttpStatus httpStatus;
         log.info(userRequestDto);
         try{
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @PutMapping("/{idUser}")
-    public ResponseEntity<DataResponse<UserEntity>> updateUser(@PathVariable(value="idUser") String idUser, @RequestBody UserRequestDto userRequestDto){
+    public ResponseEntity<DataResponse<UserResponseDto>> updateUser(@PathVariable(value="idUser") String idUser, @RequestBody UserRequestDto userRequestDto){
         HttpStatus httpStatus;
         userRequestDto.setIdUser(idUser);
         log.info(userRequestDto);
@@ -51,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping("/{idUser}")
-    public ResponseEntity<DataResponse<UserEntity>> getUser(@PathVariable(value="idUser") String idUser){
+    public ResponseEntity<DataResponse<UserResponseDto>> getUser(@PathVariable(value="idUser") String idUser){
         HttpStatus httpStatus;
         log.info("getUser by id {}", idUser);
         try{
@@ -65,7 +66,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<DataResponse<Page<UserEntity>>> getList(@RequestBody RequestDto<UserRequestDto> requestDto){
+    public ResponseEntity<DataResponse<Page<UserResponseDto>>> getList(@RequestBody RequestDto<UserRequestDto> requestDto){
         HttpStatus httpStatus;
         log.info(requestDto);
         try{

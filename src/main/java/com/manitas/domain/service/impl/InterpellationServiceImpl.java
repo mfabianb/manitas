@@ -2,6 +2,7 @@ package com.manitas.domain.service.impl;
 
 import com.manitas.application.dto.request.AnswerRequestDto;
 import com.manitas.application.dto.request.InterpellationRequestDto;
+import com.manitas.application.dto.request.QuestionnaireDynamicBlankDto;
 import com.manitas.application.dto.request.RequestDto;
 import com.manitas.application.dto.response.InterpellationResponseDto;
 import com.manitas.domain.data.entity.InterpellationEntity;
@@ -84,11 +85,11 @@ public class InterpellationServiceImpl implements InterpellationService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void updateInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
+    public InterpellationResponseDto updateInterpellation(InterpellationRequestDto interpellationRequestDto) throws BusinessException {
 
         validateCorrectAnswer(interpellationRequestDto.getAnswers());
 
-        List<InterpellationEntity> interpellationEntityList = getAllInterpellationByKey(interpellationRequestDto.getIdInterpellation());
+        List<InterpellationEntity> interpellationEntityList = getAllInterpellationByKey(interpellationRequestDto.getInterpellationKey());
 
         interpellationRequestDto.getQuestion().setIdQuestion(interpellationEntityList.get(0).getIdQuestion().getIdQuestion());
 
@@ -113,30 +114,27 @@ public class InterpellationServiceImpl implements InterpellationService {
             }
         });
 
+        List<InterpellationEntity> interpellationResult = new ArrayList<>();
+
         try {
-            interpellationRepository.saveAll(interpellationEntityList);
+            interpellationResult.addAll(interpellationRepository.saveAll(interpellationEntityList));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         log.info("Interpellation list with id {} saved", interpellationEntityList.get(0).getIdInterpellation());
 
+        return InterpellationUtility.entityToResponseDto(interpellationResult);
+
     }
 
     @Override
-    public List<InterpellationEntity> getAllInterpellationById(String id) throws BusinessException {
-        List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.getAllById(id);
-        if(!optionalInterpellationEntity.isEmpty()) return optionalInterpellationEntity;
-        else throw new BusinessException(SOME + INTERPELLATION + SPACE + REQUIRED);
-    }
-
-    @Override
-    public InterpellationResponseDto getInterpellationResponseDtoById(String id) throws BusinessException {
-        List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.getAllById(id);
+    public InterpellationResponseDto getInterpellationResponseDtoByKey(String id) throws BusinessException {
+        List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.getAllByInterpellationKey(id);
         if(!optionalInterpellationEntity.isEmpty()){
             return InterpellationUtility.entityToResponseDto(optionalInterpellationEntity);
         }
-        else throw new BusinessException(SOME + SPACE + INTERPELLATION + SPACE + REQUIRED);
+        else throw new BusinessException(INTERPELLATION + SPACE + NOT_FOUND);
     }
 
     @Override
@@ -160,6 +158,24 @@ public class InterpellationServiceImpl implements InterpellationService {
     public List<InterpellationEntity> getAllInterpellationByKey(String id) throws BusinessException {
         List<InterpellationEntity> optionalInterpellationEntity = interpellationRepository.findAllByInterpellationKey(id);
         if(!optionalInterpellationEntity.isEmpty()) return optionalInterpellationEntity;
+        else throw new BusinessException(SOME + INTERPELLATION + SPACE + REQUIRED);
+    }
+
+    @Override
+    public List<InterpellationEntity> getAllInterpellationByTopics(
+            QuestionnaireDynamicBlankDto questionnaireDynamicBlankDto) throws BusinessException {
+
+        RequestDto<String> requestDto = new RequestDto<>();
+        requestDto.setData("");
+        requestDto.setDescending(true);
+        requestDto.setPage(0);
+        requestDto.setSize(questionnaireDynamicBlankDto.getInterpellationLimit() * 4);
+        requestDto.setSort("interpellationKey");
+        Pageable pageable = PageUtility.getPage(requestDto);
+
+        Page<InterpellationEntity> optionalInterpellationEntity
+                = interpellationRepository.findAllByIdTopics(questionnaireDynamicBlankDto.getTopics(), pageable);
+        if(!optionalInterpellationEntity.isEmpty()) return optionalInterpellationEntity.getContent();
         else throw new BusinessException(SOME + INTERPELLATION + SPACE + REQUIRED);
     }
 

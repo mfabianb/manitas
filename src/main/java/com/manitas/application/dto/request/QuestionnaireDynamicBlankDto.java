@@ -11,10 +11,8 @@ import java.util.List;
 @EqualsAndHashCode
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
-public class InterpellationRequestDto {
-    private String idInterpellation;
-    private String interpellationKey;
-    private QuestionRequestDto question;
-    private List<AnswerRequestDto> answers;
-    private Boolean enable;
+public class QuestionnaireDynamicBlankDto {
+    private String idQuestionnaire;
+    private Integer interpellationLimit;
+    private List<Integer> topics;
 }

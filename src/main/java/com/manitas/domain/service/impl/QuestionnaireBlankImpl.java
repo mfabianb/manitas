@@ -1,5 +1,6 @@
 package com.manitas.domain.service.impl;
 
+import com.manitas.application.dto.request.QuestionnaireDynamicBlankDto;
 import com.manitas.application.dto.request.QuestionnaireManualBlankDto;
 import com.manitas.application.dto.request.QuestionnaireSteadyRequestDto;
 import com.manitas.application.dto.request.RequestDto;
@@ -18,9 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -53,26 +52,24 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
 
         List<QuestionnaireBlankEntity> questionnaireBlankEntities = new ArrayList<>();
 
-        StringBuilder stringBuilder = new StringBuilder();
-
         String unique = UUID.randomUUID().toString();
         log.info("Generated unique: {}", unique);
 
-        interpellationEntities.forEach(i ->{
-            stringBuilder.append(i.getIdQuestion().getIdTopic().getName()).append(",");
+        interpellationEntities.forEach(i ->
             questionnaireBlankEntities.add(QuestionnaireBlankEntity.builder()
                     .idQuestionnaireBlank(UUID.randomUUID().toString())
                     .idQuestionnaire(questionnaireEntity)
                     .idInterpellation(i)
                     .blankKey(unique)
                     .interpellationKey(i.getInterpellationKey())
-                    .build());
-        });
+                    .build()));
+
+        String topics = getTopicListByInterpellationList(interpellationEntities);
 
         questionnaireEntity.setEnable(Boolean.TRUE);
         questionnaireEntity.setModificationDate(LocalDateTime.now());
         questionnaireEntity.setLength(questionnaireBlankEntities.size()/4);
-        questionnaireEntity.setTopic(stringBuilder.substring(0, stringBuilder.toString().length() - 1));
+        questionnaireEntity.setTopic(topics);
 
         List<QuestionnaireBlankEntity> questionnaireBlankEntity = questionnaireBlankRepository.saveAll(questionnaireBlankEntities);
 
@@ -83,13 +80,18 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
     }
 
     @Override
-    public void createQuestionnaireByIdInterpellations(QuestionnaireSteadyRequestDto questionnaireDto) throws BusinessException {
+    public void createQuestionnaireSteady(QuestionnaireSteadyRequestDto questionnaireDto) throws BusinessException {
 
         String uniqueKey = UUID.randomUUID().toString();
 
         log.info("SE VA A CREAR EL CUESTIONARIO EN BLANCO CON EL ID: {}", uniqueKey);
 
         QuestionnaireEntity questionnaireEntity = questionnaireService.getQuestionnaireById(questionnaireDto.getIdQuestionnaire());
+
+        if(Objects.nonNull(questionnaireEntity.getLength())
+                && Objects.requireNonNull(questionnaireEntity.getLength()) > 0)
+            throw new BusinessException("EL CUESTIONARIO YA HA CONTIENE REACTIVOS");
+
         List<InterpellationEntity> interpellationEntityList = new ArrayList<>();
         List<QuestionnaireBlankEntity> questionnaireBlankEntityList = new ArrayList<>();
 
@@ -103,17 +105,72 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
 
         log.info("interpellationEntityList.size(): {}", interpellationEntityList.size());
 
-        interpellationEntityList.forEach(i->{
+        interpellationEntityList.forEach(i->
             questionnaireBlankEntityList.add(QuestionnaireBlankEntity.builder()
                     .idQuestionnaireBlank(UUID.randomUUID().toString())
                     .idQuestionnaire(questionnaireEntity)
                     .idInterpellation(i)
                     .interpellationKey(i.getInterpellationKey())
                     .blankKey(uniqueKey)
-                    .build());
-        });
+                    .build()));
 
         questionnaireBlankRepository.saveAll(questionnaireBlankEntityList);
+
+        String topics = getTopicListByInterpellationList(interpellationEntityList);
+
+        questionnaireEntity.setTopic(topics);
+        questionnaireEntity.setModificationDate(LocalDateTime.now());
+        questionnaireEntity.setLength(questionnaireBlankEntityList.size()/4);
+        questionnaireEntity.setEnable(Boolean.TRUE);
+
+        questionnaireService.updateQuestionnaireData(questionnaireEntity);
+
+        log.info("SE CREÓ EL CUESTIONARIO EN BLANCO CON EL ID: {}", uniqueKey);
+
+    }
+
+    @Override
+    public void createQuestionnaireDynamic(QuestionnaireDynamicBlankDto questionnaireDto) throws BusinessException {
+
+        String uniqueKey = UUID.randomUUID().toString();
+
+        log.info("SE VA A CREAR EL CUESTIONARIO EN BLANCO CON EL ID: {}", uniqueKey);
+
+        QuestionnaireEntity questionnaireEntity = questionnaireService.getQuestionnaireById(questionnaireDto.getIdQuestionnaire());
+
+        if(Objects.nonNull(questionnaireEntity.getLength())
+                && Objects.requireNonNull(questionnaireEntity.getLength()) > 0)
+            throw new BusinessException("EL CUESTIONARIO YA HA CONTIENE REACTIVOS");
+
+        if(questionnaireDto.getInterpellationLimit() < 1) throw new BusinessException("EL CUESTIONARIO DEBE DE TENER AL MENOS UN REACTIVO");
+
+        if(questionnaireDto.getTopics().isEmpty()) throw new BusinessException("EL CUESTIONARIO DEBE DE TENER AL MENOS UN TEMA");
+
+        List<QuestionnaireBlankEntity> questionnaireBlankEntityList = new ArrayList<>();
+
+        List<InterpellationEntity> interpellationEntityList = new ArrayList<>(interpellationService.getAllInterpellationByTopics(questionnaireDto));
+
+        log.info("interpellationEntityList.size(): {}", interpellationEntityList.size());
+
+        interpellationEntityList.forEach(i->
+                questionnaireBlankEntityList.add(QuestionnaireBlankEntity.builder()
+                        .idQuestionnaireBlank(UUID.randomUUID().toString())
+                        .idQuestionnaire(questionnaireEntity)
+                        .idInterpellation(i)
+                        .interpellationKey(i.getInterpellationKey())
+                        .blankKey(uniqueKey)
+                        .build()));
+
+        questionnaireBlankRepository.saveAll(questionnaireBlankEntityList);
+
+        String topics = getTopicListByInterpellationList(interpellationEntityList);
+
+        questionnaireEntity.setTopic(topics);
+        questionnaireEntity.setModificationDate(LocalDateTime.now());
+        questionnaireEntity.setLength(questionnaireBlankEntityList.size()/4);
+        questionnaireEntity.setEnable(Boolean.TRUE);
+
+        questionnaireService.updateQuestionnaireData(questionnaireEntity);
 
         log.info("SE CREÓ EL CUESTIONARIO EN BLANCO CON EL ID: {}", uniqueKey);
 
@@ -137,6 +194,16 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
     @Override
     public QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException {
         return questionnaireService.createQuestionnaireData(questionnaireEntity);
+    }
+
+    private String getTopicListByInterpellationList(List<InterpellationEntity> interpellationEntities){
+
+        StringBuilder stringBuilder = new StringBuilder();
+        Set<String> topics = new HashSet<>();
+        interpellationEntities.forEach(i -> topics.add(i.getIdQuestion().getIdTopic().getName()));
+        topics.forEach(t -> stringBuilder.append(t).append(","));
+        return stringBuilder.substring(0, stringBuilder.toString().length() - 1);
+
     }
 
 }

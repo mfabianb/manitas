@@ -4,6 +4,7 @@ import com.manitas.application.dto.response.AnswerResponseDto;
 import com.manitas.application.dto.response.InterpellationResponseDto;
 import com.manitas.domain.data.entity.AnswerEntity;
 import com.manitas.domain.data.entity.InterpellationEntity;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Log4j2
 public class InterpellationUtility {
 
     private InterpellationUtility(){/*Comment to avoid Sonar lint*/}
@@ -18,12 +20,12 @@ public class InterpellationUtility {
     public static List<InterpellationResponseDto> entityListToResponseDtoList(List<InterpellationEntity> interpellationEntity){
         Set<String> set = new HashSet<>();
 
-        interpellationEntity.forEach(i->set.add(i.getIdInterpellation()));
+        interpellationEntity.forEach(i->set.add(i.getInterpellationKey()));
 
         List<InterpellationResponseDto> interpellationResponseDtoList = new ArrayList<>();
 
         set.forEach(s ->
-            interpellationResponseDtoList.add(entityToResponseDto(interpellationEntity.stream().filter(i->i.getIdInterpellation().equals(s)).collect(Collectors.toList())))
+            interpellationResponseDtoList.add(entityToResponseDto(interpellationEntity.stream().filter(i->i.getInterpellationKey().equals(s)).collect(Collectors.toList())))
         );
 
         return interpellationResponseDtoList;
@@ -36,11 +38,11 @@ public class InterpellationUtility {
 
         response.setIdInterpellation(interpellationEntity.get(0).getIdInterpellation());
         response.setQuestion(interpellationEntity.get(0).getIdQuestion());
+        response.setInterpellationKey(interpellationEntity.get(0).getInterpellationKey());
         response.setAnswers(new ArrayList<>());
 
         interpellationEntity.forEach(i->
                 response.getAnswers().add(entityToResponseDto(i.getIdAnswer(), i.getCorrect()))
-
         );
 
         return response;

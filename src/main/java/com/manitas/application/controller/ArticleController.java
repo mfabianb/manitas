@@ -2,6 +2,7 @@ package com.manitas.application.controller;
 
 import com.manitas.application.dto.request.ArticleRequestDto;
 import com.manitas.application.dto.request.RequestDto;
+import com.manitas.application.dto.response.ArticleResponseDto;
 import com.manitas.application.dto.response.DataResponse;
 import com.manitas.domain.data.entity.ArticleEntity;
 import com.manitas.domain.exception.BusinessException;
@@ -22,7 +23,7 @@ public class ArticleController {
     private ArticleService articleService;
 
     @PostMapping
-    public ResponseEntity<DataResponse<ArticleEntity>> createArticle(@RequestBody ArticleRequestDto articleRequestDto){
+    public ResponseEntity<DataResponse<ArticleResponseDto>> createArticle(@RequestBody ArticleRequestDto articleRequestDto){
         log.info(articleRequestDto);
         HttpStatus httpStatus;
         try{
@@ -36,7 +37,7 @@ public class ArticleController {
     }
 
     @PutMapping("/{idArticle}")
-    public ResponseEntity<DataResponse<ArticleEntity>> updateArticle(@PathVariable(value = "idArticle") String idArticle, @RequestBody ArticleRequestDto articleRequestDto){
+    public ResponseEntity<DataResponse<ArticleResponseDto>> updateArticle(@PathVariable(value = "idArticle") String idArticle, @RequestBody ArticleRequestDto articleRequestDto){
         HttpStatus httpStatus;
         articleRequestDto.setIdArticle(idArticle);
         log.info(articleRequestDto);
@@ -51,12 +52,12 @@ public class ArticleController {
     }
 
     @GetMapping("/{idArticle}")
-    public ResponseEntity<DataResponse<ArticleEntity>> getArticle(@PathVariable(value = "idArticle") String idArticle){
+    public ResponseEntity<DataResponse<ArticleResponseDto>> getArticle(@PathVariable(value = "idArticle") String idArticle){
         HttpStatus httpStatus;
         log.info("getArticle by id {}", idArticle);
         try{
             httpStatus = HttpStatus.OK;
-            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.getArticleById(idArticle)), httpStatus);
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), articleService.getArticleDtoById(idArticle)), httpStatus);
         }catch (BusinessException e){
             log.info(e);
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -65,7 +66,7 @@ public class ArticleController {
     }
 
     @GetMapping
-    public ResponseEntity<DataResponse<Page<ArticleEntity>>> getArticleList(@RequestBody RequestDto<ArticleRequestDto> articleDtoDataResponse){
+    public ResponseEntity<DataResponse<Page<ArticleResponseDto>>> getArticleList(@RequestBody RequestDto<ArticleRequestDto> articleDtoDataResponse){
         log.info(articleDtoDataResponse);
         HttpStatus httpStatus;
         try{

@@ -2,12 +2,14 @@ package com.manitas.domain.service.impl;
 
 import com.manitas.application.dto.request.UserRequestDto;
 import com.manitas.application.dto.request.RequestDto;
+import com.manitas.application.dto.response.UserResponseDto;
 import com.manitas.domain.data.entity.UserEntity;
 import com.manitas.domain.data.repository.UserRepository;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.CatalogService;
 import com.manitas.domain.service.UserService;
 import com.manitas.utils.PageUtility;
+import com.manitas.utils.UserUtility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private CatalogService catalogService;
 
     @Override
-    public UserEntity createUser(UserRequestDto userRequestDto) throws BusinessException {
+    public UserResponseDto createUser(UserRequestDto userRequestDto) throws BusinessException {
 
         validateMandatoryUserData(userRequestDto);
 
@@ -47,7 +49,7 @@ public class UserServiceImpl implements UserService {
                     .idRole(catalogService.getRoleById(userRequestDto.getIdRole()))
                     .idUserStatus(catalogService.getUserStatusById(userRequestDto.getIdUserStatus()))
                     .build();
-            return userRepository.save(userEntity);
+            return UserUtility.entityToDto(userRepository.save(userEntity));
         }
 
         throw new BusinessException(USER + SPACE + ALREADY_EXISTS);
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity updateUser(UserRequestDto userRequestDto) throws BusinessException {
+    public UserResponseDto updateUser(UserRequestDto userRequestDto) throws BusinessException {
 
         validateMandatoryUserData(userRequestDto);
         validateOptionalUserData(userRequestDto);
@@ -71,23 +73,23 @@ public class UserServiceImpl implements UserService {
 
         updateData(userEntity, userRequestDto);
 
-        return userRepository.save(userEntity);
+        return UserUtility.entityToDto(userRepository.save(userEntity));
 
     }
 
     @Override
-    public UserEntity getUser(String idUser) throws BusinessException {
+    public UserResponseDto getUser(String idUser) throws BusinessException {
 
         Optional<UserEntity> userEntity = userRepository.findUserByIdUser(idUser);
-        if(userEntity.isPresent()) return userEntity.get();
+        if(userEntity.isPresent()) return UserUtility.entityToDto(userEntity.get());
         else throw new BusinessException(USER + SPACE + NOT_FOUND);
 
     }
 
     @Override
-    public Page<UserEntity> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto){
+    public Page<UserResponseDto> getList(RequestDto<UserRequestDto> userRequestDtoRequestDto){
 
-        return userRepository.findPageByFilter(
+        return userRepository.findPageDtoByFilter(
                 userRequestDtoRequestDto.getData().getEmail(),
                 userRequestDtoRequestDto.getData().getName(),
                 userRequestDtoRequestDto.getData().getLastname(),

@@ -6,6 +6,7 @@ import com.manitas.application.dto.response.DataResponse;
 import com.manitas.application.dto.response.InterpellationResponseDto;
 import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.InterpellationService;
+import com.manitas.utils.InterpellationUtility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,24 +23,28 @@ public class InterpellationController {
     private InterpellationService interpellationService;
 
     @PostMapping
-    public ResponseEntity<Object> createInterpellation(@RequestBody InterpellationRequestDto interpellationRequestDto){
+    public ResponseEntity<DataResponse<InterpellationResponseDto>> createInterpellation(@RequestBody InterpellationRequestDto interpellationRequestDto){
+        log.info("updateInterpellation: {}", interpellationRequestDto);
         try{
-            interpellationService.createInterpellation(interpellationRequestDto);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (BusinessException e){
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(),
+                    InterpellationUtility.entityToResponseDto(interpellationService.createInterpellation(interpellationRequestDto))) , HttpStatus.OK);
+        }catch (Exception e){
             log.info(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{idInterpellation}")
-    public ResponseEntity<Object> updateInterpellation(@PathVariable(value="idInterpellation") String idInterpellation,
+    public ResponseEntity<DataResponse<InterpellationResponseDto>> updateInterpellation(@PathVariable(value="idInterpellation") String idInterpellation,
                                                        @RequestBody InterpellationRequestDto interpellationRequestDto){
+
+        interpellationRequestDto.setIdInterpellation(idInterpellation);
+        interpellationRequestDto.setInterpellationKey(idInterpellation);
+        log.info("updateInterpellation: {}", interpellationRequestDto);
         try{
-            interpellationRequestDto.setIdInterpellation(idInterpellation);
-            interpellationService.updateInterpellation(interpellationRequestDto);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (BusinessException e){
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(),
+                    interpellationService.updateInterpellation(interpellationRequestDto)) , HttpStatus.OK);
+        }catch (Exception e){
             log.info(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -49,7 +54,7 @@ public class InterpellationController {
     public ResponseEntity<DataResponse<InterpellationResponseDto>> getInterpellation(@PathVariable(value="idInterpellation") String idInterpellation){
         try{
             return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(),
-                    interpellationService.getInterpellationResponseDtoById(idInterpellation)) , HttpStatus.OK);
+                    interpellationService.getInterpellationResponseDtoByKey(idInterpellation)) , HttpStatus.OK);
         }catch (Exception e){
             log.info(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

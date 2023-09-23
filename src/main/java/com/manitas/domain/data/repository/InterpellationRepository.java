@@ -13,11 +13,8 @@ import java.util.List;
 
 @Repository
 public interface InterpellationRepository extends JpaRepository<InterpellationEntity, String> {
-    @Query("SELECT i FROM InterpellationEntity i WHERE i.idInterpellation = :id")
-    List<InterpellationEntity> getAllById(String id);
-
-    @Query("SELECT i FROM InterpellationEntity i ORDER BY i.idInterpellation, i.idQuestion")
-    List<InterpellationEntity> findAEntityListOrdered();
+    @Query("SELECT i FROM InterpellationEntity i WHERE i.interpellationKey = :id")
+    List<InterpellationEntity> getAllByInterpellationKey(String id);
 
     @Query("SELECT i FROM InterpellationEntity i WHERE " +
             "(i.idQuestion.question like %:question%) " +
@@ -33,4 +30,7 @@ public interface InterpellationRepository extends JpaRepository<InterpellationEn
                                                  Pageable pageable);
 
     List<InterpellationEntity> findAllByInterpellationKey(String interpellationKey);
+
+    @Query("SELECT i FROM InterpellationEntity i WHERE i.idQuestion.idTopic.idTopic IN (:idTopics) AND i.idQuestion.enable = true ORDER BY i.interpellationKey")
+    Page<InterpellationEntity> findAllByIdTopics(@Param("idTopics") List<Integer> idTopics, Pageable pageable);
 }

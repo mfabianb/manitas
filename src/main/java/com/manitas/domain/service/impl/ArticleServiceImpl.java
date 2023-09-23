@@ -2,6 +2,7 @@ package com.manitas.domain.service.impl;
 
 import com.manitas.application.dto.request.ArticleRequestDto;
 import com.manitas.application.dto.request.RequestDto;
+import com.manitas.application.dto.response.ArticleResponseDto;
 import com.manitas.domain.data.entity.ArticleEntity;
 import com.manitas.domain.data.entity.MediaEntity;
 import com.manitas.domain.data.entity.UserEntity;
@@ -10,6 +11,7 @@ import com.manitas.domain.exception.BusinessException;
 import com.manitas.domain.service.ArticleService;
 import com.manitas.domain.service.CatalogService;
 import com.manitas.domain.service.UserService;
+import com.manitas.utils.ArticleUtility;
 import com.manitas.utils.PageUtility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +42,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public ArticleEntity createArticle(ArticleRequestDto articleRequestDto) throws BusinessException {
+    public ArticleResponseDto createArticle(ArticleRequestDto articleRequestDto) throws BusinessException {
 
         validateMandatoryArticleDto(articleRequestDto);
 
-        return articleRepository.saveAndFlush(
+        return ArticleUtility.entityToResponseDto(articleRepository.saveAndFlush(
                 ArticleEntity.builder()
                         .idArticle(UUID.randomUUID().toString())
                         .name(articleRequestDto.getName())
@@ -61,12 +63,12 @@ public class ArticleServiceImpl implements ArticleService {
                         .idTopic(catalogService.getTopicById(articleRequestDto.getIdTopic()))
                         .enable(Boolean.TRUE)
                         .build()
-        );
+        ));
 
     }
 
     @Override
-    public ArticleEntity updateArticle(ArticleRequestDto articleRequestDto) throws BusinessException {
+    public ArticleResponseDto updateArticle(ArticleRequestDto articleRequestDto) throws BusinessException {
 
         validateMandatoryArticleDto(articleRequestDto);
 
@@ -76,7 +78,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         updateData(articleRequestDto, articleEntity);
 
-        return articleRepository.save(articleEntity);
+        return ArticleUtility.entityToResponseDto(articleRepository.save(articleEntity));
 
     }
 
@@ -88,11 +90,20 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<ArticleEntity> getPage(RequestDto<ArticleRequestDto> articleDto){
-        return articleRepository.getArticlePage(articleDto.getData().getName(), articleDto.getData().getDescription(),
+    public ArticleResponseDto getArticleDtoById(String id) throws BusinessException {
+        Optional<ArticleEntity> optionalArticleEntity = articleRepository.findById(id);
+        if(optionalArticleEntity.isPresent()) return ArticleUtility.entityToResponseDto(optionalArticleEntity.get());
+        else throw new BusinessException(ARTICLE + SPACE + NOT_FOUND);
+    }
+
+    @Override
+    public Page<ArticleResponseDto> getPage(RequestDto<ArticleRequestDto> articleDto){
+
+        return articleRepository.getArticleDtoPage(articleDto.getData().getName(), articleDto.getData().getDescription(),
                 articleDto.getData().getInfo(), articleDto.getData().getCreationDate(), articleDto.getData().getModificationDate(),
                 articleDto.getData().getEmail(), articleDto.getData().getIdTopic(), articleDto.getData().getEnable(),
                 PageUtility.getPage(articleDto));
+
     }
 
     private void validateMandatoryArticleDto(ArticleRequestDto articleRequestDto) throws BusinessException {

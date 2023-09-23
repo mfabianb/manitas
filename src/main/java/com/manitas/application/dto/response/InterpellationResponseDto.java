@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class InterpellationResponseDto {
     private String idInterpellation;
+    private String interpellationKey;
     private QuestionEntity question;
     private List<AnswerResponseDto> answers;
 }
