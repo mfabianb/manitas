@@ -21,4 +21,6 @@ public interface QuestionnaireBlankService {
     QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException;
 
     Page<QuestionnaireEntity> getQuestionnairePage(RequestDto<QuestionnaireBlankRequestDto> requestDto) throws BusinessException;
+
+    QuestionnaireEntity getQuestionnaireById(String id) throws BusinessException;
 }

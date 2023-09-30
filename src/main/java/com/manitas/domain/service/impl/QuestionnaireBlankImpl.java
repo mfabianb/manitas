@@ -208,4 +208,9 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
         return questionnaireService.getQuestionnairePage(requestDto);
     }
 
+    @Override
+    public QuestionnaireEntity getQuestionnaireById(String id) throws BusinessException {
+        return  questionnaireService.getQuestionnaireById(id);
+    }
+
 }

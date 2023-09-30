@@ -32,11 +32,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         if(token.isEmpty()) throw new BusinessException(UNAUTHORIZED);
 
-        log.info(token);
-
         String tokenData = encodeService.decode(token);
-
-        log.info(tokenData);
 
         if(Objects.isNull(tokenData)) throw new BusinessException(UNAUTHORIZED);
 
