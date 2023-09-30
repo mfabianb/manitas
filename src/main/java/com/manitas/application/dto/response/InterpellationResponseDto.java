@@ -15,6 +15,8 @@ import java.util.List;
 public class InterpellationResponseDto {
     private String idInterpellation;
     private String interpellationKey;
+    private String idQuestionnaireBlank;
+    private String questionnaireBlankKey;
     private QuestionEntity question;
     private List<AnswerResponseDto> answers;
 }

@@ -1,12 +1,13 @@
 package com.manitas.domain.service;
 
 import com.manitas.application.dto.request.*;
-import com.manitas.domain.data.entity.InterpellationEntity;
-import com.manitas.domain.data.entity.QuestionnaireEntity;
+import com.manitas.application.dto.response.InterpellationResponseDto;
+import com.manitas.domain.data.entity.QuestionnaireBlankEntity;
 import com.manitas.domain.exception.BusinessException;
-import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface QuestionnaireBlankService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -16,11 +17,9 @@ public interface QuestionnaireBlankService {
 
     void createQuestionnaireDynamic(QuestionnaireDynamicBlankDto questionnaireDto) throws BusinessException;
 
-    Page<InterpellationEntity> getInterpellationByQuestionnaire(String idQuestionnaire) throws BusinessException;
+    List<InterpellationResponseDto> getAllInterpellationToReplyDto(String blankKey);
 
-    QuestionnaireEntity createQuestionnaireData(QuestionnaireEntity questionnaireEntity) throws BusinessException;
+    QuestionnaireBlankEntity getBlankById(String id) throws BusinessException;
 
-    Page<QuestionnaireEntity> getQuestionnairePage(RequestDto<QuestionnaireBlankRequestDto> requestDto) throws BusinessException;
-
-    QuestionnaireEntity getQuestionnaireById(String id) throws BusinessException;
+    long countInterpellationForQuestionnaireByBlankKey(String blankKey);
 }
