@@ -96,9 +96,11 @@ public class UserServiceImpl implements UserService {
 
         Optional<UserEntity> userEntity = userRepository.findUserByIdUser(idUser);
 
-        log.info(userEntity.get().getIdUser());
+        if(userEntity.isPresent()) {
+            log.info(userEntity.get().getIdUser());
+            return userEntity.get();
+        }
 
-        if(userEntity.isPresent()) return userEntity.get();
         else throw new BusinessException(USER + SPACE + NOT_FOUND);
 
     }

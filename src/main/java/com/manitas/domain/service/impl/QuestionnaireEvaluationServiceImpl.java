@@ -1,10 +1,8 @@
 package com.manitas.domain.service.impl;
 
+import com.manitas.application.dto.request.InterpellationReplyRequestDto;
 import com.manitas.application.dto.request.ReplyQuestionnaireFromUserRequestDto;
-import com.manitas.domain.data.entity.QuestionnaireAnsweredEntity;
-import com.manitas.domain.data.entity.QuestionnaireEntity;
-import com.manitas.domain.data.entity.UserEntity;
-import com.manitas.domain.data.entity.UserResultEntity;
+import com.manitas.domain.data.entity.*;
 import com.manitas.domain.data.repository.QuestionnaireAnsweredRepository;
 import com.manitas.domain.data.repository.UserResultRepository;
 import com.manitas.domain.exception.BusinessException;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,16 +34,23 @@ public class QuestionnaireEvaluationServiceImpl implements QuestionnaireEvaluati
     private UserResultRepository userResultRepository;
 
     @Autowired
+    private InterpellationService interpellationService;
+
+    @Autowired
     private UserService userService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void questionnaireReplyFromUser(ReplyQuestionnaireFromUserRequestDto replyDto) throws BusinessException {
+
+        validateDto(replyDto);
+
         UserEntity userEntity = userService.getUserEntity(replyDto.getIdUser());
 
         List<QuestionnaireAnsweredEntity> questionnaireAnsweredEntityList = new ArrayList<>();
 
         long count = questionnaireBlankService.countInterpellationForQuestionnaireByBlankKey(replyDto.getBlankKey());
+        String unique = UUID.randomUUID().toString();
 
         if(replyDto.getAnswers().size() != count) throw new BusinessException("EL NÚMERO DE RESPUESTAS Y PREGUNTAS DEBE DE SER IGUAL");
 
@@ -57,6 +63,7 @@ public class QuestionnaireEvaluationServiceImpl implements QuestionnaireEvaluati
                                 .idUser(userEntity)
                                 .blankKey(replyDto.getBlankKey())
                                 .userAnswer(a.getAnswer())
+                                .answeredKey(unique)
                                 .build()
                 );
             } catch (BusinessException e) {
@@ -70,14 +77,15 @@ public class QuestionnaireEvaluationServiceImpl implements QuestionnaireEvaluati
 
         log.info("RESPUESTAS DEL CUESTIONARIO GUARDADAS");
 
-        evaluateQuestionnaire(userEntity, replyDto.getBlankKey());
+        evaluateQuestionnaire(userEntity, replyDto.getBlankKey(), unique);
 
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    private void evaluateQuestionnaire(UserEntity userEntity, String blankKey) throws BusinessException {
+    public void evaluateQuestionnaire(UserEntity userEntity, String blankKey, String unique) throws BusinessException {
 
-        List<QuestionnaireAnsweredEntity> questionnaireAnsweredEntityList = questionnaireAnsweredRepository.findByIdUserAndBlankKey(blankKey, userEntity);
+        List<QuestionnaireAnsweredEntity> questionnaireAnsweredEntityList =
+                questionnaireAnsweredRepository.findByIdUserAndBlankKeyAndAnsweredKey(blankKey, unique, userEntity);
 
         if(questionnaireAnsweredEntityList.isEmpty()) throw new BusinessException("EL CUESTIONARIO DEBE DE ESTAR RESPONDIDO");
 
@@ -86,9 +94,16 @@ public class QuestionnaireEvaluationServiceImpl implements QuestionnaireEvaluati
         AtomicLong countCorrect = new AtomicLong();
 
         questionnaireAnsweredEntityList.forEach(q -> {
-            if(Boolean.TRUE.equals(q.getIdQuestionnaireBlank().getIdInterpellation().getCorrect())
-                    && q.getIdQuestionnaireBlank().getIdInterpellation().getIdAnswer().getAnswer().equals(q.getUserAnswer()))
-                countCorrect.getAndIncrement();
+
+            try {
+                if(Boolean.TRUE.equals(interpellationService.getAllInterpellationByKey(q.getIdQuestionnaireBlank().getInterpellationKey())
+                        .stream().filter(i-> i.getIdAnswer().getIdAnswer().equals(q.getUserAnswer()))
+                        .findFirst().orElse(new InterpellationEntity()).getCorrect()))
+                    countCorrect.getAndIncrement();
+            } catch (BusinessException e) {
+                e.printStackTrace();
+            }
+
         });
 
         userResultRepository.save(UserResultEntity.builder()
@@ -97,9 +112,24 @@ public class QuestionnaireEvaluationServiceImpl implements QuestionnaireEvaluati
                 .idQuestionnaire(questionnaireEntity)
                 .creationDate(LocalDateTime.now())
                 .score(countCorrect.intValue())
+                .answeredKey(unique)
                 .build());
 
         log.info("RESPUESTAS DEL CUESTIONARIO EVALUADAS");
+
+    }
+
+    private void validateDto(ReplyQuestionnaireFromUserRequestDto replyDto) throws BusinessException {
+
+        if(Objects.isNull(replyDto) || Objects.isNull(replyDto.getBlankKey()) || replyDto.getBlankKey().isEmpty()
+                || Objects.isNull(replyDto.getIdUser()) || replyDto.getIdUser().isEmpty())
+            throw new BusinessException("LA INFORMACIÓN ES NECESARIA");
+
+        for(InterpellationReplyRequestDto a: replyDto.getAnswers()){
+            if(Objects.isNull(a) || Objects.isNull(a.getAnswer()) || a.getAnswer().isEmpty()
+                    || Objects.isNull(a.getIdQuestionnaireBlank()) || a.getIdQuestionnaireBlank().isEmpty())
+                throw new BusinessException("LA INFORMACIÓN ES NECESARIA");
+        }
 
     }
 

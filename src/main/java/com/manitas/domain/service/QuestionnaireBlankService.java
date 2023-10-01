@@ -17,7 +17,7 @@ public interface QuestionnaireBlankService {
 
     void createQuestionnaireDynamic(QuestionnaireDynamicBlankDto questionnaireDto) throws BusinessException;
 
-    List<InterpellationResponseDto> getAllInterpellationToReplyDto(String blankKey);
+    List<InterpellationResponseDto> getAllInterpellationToReplyDto(String idQuestionnaire) throws BusinessException;
 
     QuestionnaireBlankEntity getBlankById(String id) throws BusinessException;
 

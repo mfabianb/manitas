@@ -29,7 +29,7 @@ public class QuestionnaireBlankController {
             return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
         }catch (BusinessException e){
             log.info(e);
-            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -41,7 +41,7 @@ public class QuestionnaireBlankController {
             return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
         }catch (BusinessException e){
             log.info(e);
-            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -53,14 +53,20 @@ public class QuestionnaireBlankController {
             return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
         }catch (BusinessException e){
             log.info(e);
-            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/{blankKey}")
-    public ResponseEntity<DataResponse<List<InterpellationResponseDto>>> getQuestionnaireBlankByKey(@PathVariable(value="blankKey") String blankKey){
-        log.info("getQuestionnaireBlankByKey: {}", blankKey);
-        return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), questionnaireBlankService.getAllInterpellationToReplyDto(blankKey)), HttpStatus.OK);
+    @GetMapping("/{idQuestionnaire}")
+    public ResponseEntity<DataResponse<List<InterpellationResponseDto>>> getQuestionnaireBlankByKey(@PathVariable(value="idQuestionnaire") String idQuestionnaire){
+        log.info("getQuestionnaireBlankByKey: {}", idQuestionnaire);
+        try{
+            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), questionnaireBlankService.getAllInterpellationToReplyDto(idQuestionnaire)), HttpStatus.OK);
+        }catch (BusinessException e){
+            log.info(e);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

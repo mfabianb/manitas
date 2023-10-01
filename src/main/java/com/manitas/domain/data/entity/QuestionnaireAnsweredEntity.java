@@ -42,4 +42,7 @@ public class QuestionnaireAnsweredEntity implements Serializable {
     @Column(name = "blank_key")
     private String blankKey;
 
+    @Column(name = "answered_key")
+    private String answeredKey;
+
 }

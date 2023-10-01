@@ -29,7 +29,8 @@ public class QuestionnaireController {
                     questionnaireService.createQuestionnaireData(questionnaireManualBlankDto.getQuestionnaire())) , HttpStatus.OK);
         }catch (Exception e){
             log.info(e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null) , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -43,7 +44,8 @@ public class QuestionnaireController {
                     questionnaireService.updateQuestionnaireData(questionnaireManualBlankDto.getQuestionnaire())) , HttpStatus.OK);
         }catch (Exception e){
             log.info(e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null) , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -55,7 +57,8 @@ public class QuestionnaireController {
                     questionnaireService.getQuestionnairePage(requestDto)) , HttpStatus.OK);
         }catch (Exception e){
             log.info(e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null) , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -67,7 +70,8 @@ public class QuestionnaireController {
                     questionnaireService.getQuestionnaireById(id)) , HttpStatus.OK);
         }catch (Exception e){
             log.info(e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null) , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -19,6 +19,9 @@ public interface QuestionnaireBlankRepository extends JpaRepository<Questionnair
     @Query("SELECT q.idInterpellation FROM QuestionnaireBlankEntity q WHERE q.idQuestionnaire = :idQuestionnaire")
     Page<InterpellationEntity> getInterpellationsByIdQuestionnaire(@Param("idQuestionnaire") QuestionnaireEntity idQuestionnaire, Pageable pageable);
 
+    @Query("SELECT q FROM QuestionnaireBlankEntity q WHERE q.idQuestionnaire = :idQuestionnaire")
+    List<QuestionnaireBlankEntity> getInterpellationsByBlankKey(@Param("idQuestionnaire") QuestionnaireEntity idQuestionnaire);
+
     @Query("SELECT q FROM QuestionnaireBlankEntity q WHERE q.blankKey = :blankKey")
     List<QuestionnaireBlankEntity> getInterpellationsByBlankKey(@Param("blankKey") String blankKey);
 

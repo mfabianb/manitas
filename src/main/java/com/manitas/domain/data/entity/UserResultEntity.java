@@ -42,4 +42,7 @@ public class UserResultEntity implements Serializable {
     @NotNull
     private QuestionnaireEntity idQuestionnaire;
 
+    @Column(name = "answered_key")
+    private String answeredKey;
+
 }

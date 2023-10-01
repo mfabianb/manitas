@@ -3,7 +3,6 @@ package com.manitas.utils;
 import com.manitas.application.dto.response.AnswerResponseDto;
 import com.manitas.application.dto.response.InterpellationResponseDto;
 import com.manitas.domain.data.entity.AnswerEntity;
-import com.manitas.domain.data.entity.InterpellationEntity;
 import com.manitas.domain.data.entity.QuestionnaireBlankEntity;
 
 import java.util.ArrayList;

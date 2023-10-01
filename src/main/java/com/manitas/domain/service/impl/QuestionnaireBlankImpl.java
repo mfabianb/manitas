@@ -177,9 +177,13 @@ public class QuestionnaireBlankImpl implements QuestionnaireBlankService {
     }
 
     @Override
-    public List<InterpellationResponseDto> getAllInterpellationToReplyDto(String blankKey){
+    public List<InterpellationResponseDto> getAllInterpellationToReplyDto(String idQuestionnaire) throws BusinessException {
 
-        List<QuestionnaireBlankEntity> questionnaireBlankEntities = questionnaireBlankRepository.getInterpellationsByBlankKey(blankKey);
+        QuestionnaireEntity questionnaireEntity = questionnaireService.getQuestionnaireById(idQuestionnaire);
+
+        List<QuestionnaireBlankEntity> questionnaireBlankEntities = questionnaireBlankRepository.getInterpellationsByBlankKey(questionnaireEntity);
+
+        if(questionnaireBlankEntities.isEmpty()) throw new BusinessException("CUESTIONARIO NO ENCONTRADO");
 
         return QuestionnaireBlankUtility.entityListToResponseDtoList(questionnaireBlankEntities);
 

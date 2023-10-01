@@ -11,7 +11,8 @@ import java.util.List;
 
 @Repository
 public interface QuestionnaireAnsweredRepository extends JpaRepository<QuestionnaireAnsweredEntity, String> {
-    @Query("SELECT q FROM QuestionnaireAnsweredEntity q WHERE q.idUser = :idUser AND q.blankKey = :blankKey")
-    List<QuestionnaireAnsweredEntity> findByIdUserAndBlankKey(@Param("blankKey")String blankKey,
-                                                              @Param("blankKey") UserEntity idUser);
+    @Query("SELECT q FROM QuestionnaireAnsweredEntity q WHERE q.idUser = :idUser AND q.blankKey = :blankKey AND q.answeredKey = :answeredKey")
+    List<QuestionnaireAnsweredEntity> findByIdUserAndBlankKeyAndAnsweredKey(@Param("blankKey")String blankKey,
+                                                                            @Param("answeredKey")String answeredKey,
+                                                                            @Param("idUser") UserEntity idUser);
 }

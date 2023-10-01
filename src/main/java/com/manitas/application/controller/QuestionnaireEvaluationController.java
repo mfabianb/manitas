@@ -21,7 +21,7 @@ public class QuestionnaireEvaluationController {
     @Autowired
     private QuestionnaireEvaluationService questionnaireEvaluationService;
 
-    @PostMapping("/reply")
+    @PostMapping
     public ResponseEntity<DataResponse<Object>> replyQuestionnaire(@RequestBody ReplyQuestionnaireFromUserRequestDto replyDto){
         log.info("replyQuestionnaire: {}", replyDto);
         try{
@@ -29,7 +29,7 @@ public class QuestionnaireEvaluationController {
             return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.OK.value(), null), HttpStatus.OK);
         }catch (BusinessException e){
             log.info(e);
-            return new ResponseEntity<>(new DataResponse<>(true, null, HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new DataResponse<>(true, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
